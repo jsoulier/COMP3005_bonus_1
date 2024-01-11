@@ -1,23 +1,43 @@
+import re
 
-class Table():
+from table_element import TableElement
 
-    def __init__(self, columns, rows):
+class TableError(Exception):
 
-        self.columns = columns
-        self.rows = rows
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
-    @staticmethod
-    def selection(table, column, condition):
-        pass
+class Table:
 
-    @staticmethod
-    def projection(table, columns):
-        pass
+    def __init__(self, string):
 
-    @staticmethod
-    def cross_join(table1, table2):
-        pass
+        # Strip off all whitespace and leading newline characters
+        string = string.replace(' ', '')
+        string = string.lstrip()
 
-    @staticmethod
-    def natural_join(table1, table2, column1, column2, condition):
-        pass
+        # Sanity check on the string
+        pattern = re.compile(r'[^a-zA-Z0-9{}(),.=\-\n]')
+        if pattern.search(string):
+            raise TableError("Found Bad Characters: {}".format(pattern.findall(string)))
+
+        lines = string.splitlines()
+        columns = lines[0]
+        rows = lines[1:-1]
+
+        # Strip the header until there is only the table and column titles
+        columns = columns.replace('(', ' ')
+        columns = columns.replace(')', ' ')
+        columns = columns.replace('{', ' ')
+        columns = columns.replace('}', ' ')
+        columns = columns.replace('=', ' ')
+        columns = columns.replace(',', ' ')
+        columns = columns.split()
+
+        self.name = columns[0]
+        self.columns = columns[1:]
+        self.rows = []
+
+        # Convert the rows of strings to rows of table elements
+        for row in rows:
+            columns = row.split(',')
+            self.rows.append([TableElement(i) for i in columns])
