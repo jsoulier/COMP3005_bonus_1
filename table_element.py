@@ -12,7 +12,7 @@ class TableElement:
     '''
 
     def __init__(self, string):
-        ''' Create a new TableElement. '''
+        ''''''
         self.value = self.convert(string)
 
     @staticmethod

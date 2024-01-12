@@ -57,7 +57,7 @@ class TestQueryNode(unittest.TestCase):
         self.assertEqual(root.table_operator, TableOperator.PROJECTION)
         self.assertFalse(root.relational_operator)
         self.assertEqual(root.parameters, ['name'])
-        self.assertTrue(root.nodes)
+        self.assertEqual(len(root.nodes), 1)
         self.assertTrue(root.nodes[0].table)
         self.assertFalse(root.nodes[0].table_operator)
         self.assertFalse(root.nodes[0].relational_operator)
@@ -79,12 +79,12 @@ class TestQueryNode(unittest.TestCase):
         self.assertEqual(root.table_operator, TableOperator.PROJECTION)
         self.assertFalse(root.relational_operator)
         self.assertEqual(root.parameters, ['name'])
-        self.assertTrue(root.nodes)
+        self.assertEqual(len(root.nodes), 1)
         self.assertFalse(root.nodes[0].table)
         self.assertEqual(root.nodes[0].table_operator, TableOperator.PROJECTION)
         self.assertFalse(root.nodes[0].relational_operator)
         self.assertEqual(root.nodes[0].parameters, ['name', 'email'])
-        self.assertTrue(root.nodes[0].nodes)
+        self.assertEqual(len(root.nodes[0].nodes), 1)
         self.assertTrue(root.nodes[0].nodes[0].table)
         self.assertFalse(root.nodes[0].nodes[0].table_operator)
         self.assertFalse(root.nodes[0].nodes[0].relational_operator)
@@ -100,18 +100,118 @@ class TestQueryNode(unittest.TestCase):
             }
         '''
         root = QueryNode()
+        root.string = '   pi name(   pi name   , email (  Employees  )  )  '
+        root.parse([Table(string)])
+        self.assertFalse(root.table)
+        self.assertEqual(root.table_operator, TableOperator.PROJECTION)
+        self.assertFalse(root.relational_operator)
+        self.assertEqual(root.parameters, ['name'])
+        self.assertEqual(len(root.nodes), 1)
+        self.assertFalse(root.nodes[0].table)
+        self.assertEqual(root.nodes[0].table_operator, TableOperator.PROJECTION)
+        self.assertFalse(root.nodes[0].relational_operator)
+        self.assertEqual(root.nodes[0].parameters, ['name', 'email'])
+        self.assertTrue(root.nodes[0].nodes)
+        self.assertTrue(root.nodes[0].nodes[0].table)
+        self.assertFalse(root.nodes[0].nodes[0].table_operator)
+        self.assertFalse(root.nodes[0].nodes[0].relational_operator)
+        self.assertFalse(root.nodes[0].nodes[0].parameters)
+        self.assertFalse(root.nodes[0].nodes[0].nodes)
+
+    def test_parse5(self):
+        string = '''
+            Employees (ID, Name, Age) = {
+                1, John, 32
+                2, Alice, 28
+                3, Bob, 29
+            }
+        '''
+        root = QueryNode()
         root.string = 'select id > 1 (Employees)'
         root.parse([Table(string)])
         self.assertFalse(root.table)
         self.assertEqual(root.table_operator, TableOperator.SELECTION)
         self.assertEqual(root.relational_operator, RelationalOperator.GREATER)
         self.assertEqual(root.parameters, ['id', '1'])
-        self.assertTrue(root.nodes)
+        self.assertEqual(len(root.nodes), 1)
         self.assertTrue(root.nodes[0].table)
         self.assertFalse(root.nodes[0].table_operator)
         self.assertFalse(root.nodes[0].relational_operator)
         self.assertFalse(root.nodes[0].parameters)
         self.assertFalse(root.nodes[0].nodes)
+
+    def test_parse6(self):
+        string1 = '''
+            Employees (ID, Name, Age, Dept) = {
+                1, John, 32, Sales
+                2, Alice, 28, Finance
+                3, Bob, 29, HR
+            }
+        '''
+        string2 = '''
+            Department (Name, Budget) = {
+                Finance, 20000
+                Sales, 30000
+                HR, 25000
+            }
+        '''
+        root = QueryNode()
+        root.string = '(Employees) {} (Department)'.format(TableOperator.CROSS_JOIN.symbol())
+        root.parse([Table(string1), Table(string2)])
+        self.assertFalse(root.table)
+        self.assertEqual(root.table_operator, TableOperator.CROSS_JOIN)
+        self.assertFalse(root.relational_operator)
+        self.assertFalse(root.parameters)
+        self.assertEqual(len(root.nodes), 2)
+        self.assertTrue(root.nodes[0].table)
+        self.assertFalse(root.nodes[0].table_operator)
+        self.assertFalse(root.nodes[0].relational_operator)
+        self.assertFalse(root.nodes[0].parameters)
+        self.assertFalse(root.nodes[0].nodes)
+        self.assertTrue(root.nodes[1].table)
+        self.assertFalse(root.nodes[1].table_operator)
+        self.assertFalse(root.nodes[1].relational_operator)
+        self.assertFalse(root.nodes[1].parameters)
+        self.assertFalse(root.nodes[1].nodes)
+
+    def test_parse7(self):
+        string1 = '''
+            Employees (ID, Name, Age, Dept) = {
+                1, John, 32, Sales
+                2, Alice, 28, Finance
+                3, Bob, 29, HR
+            }
+        '''
+        string2 = '''
+            Department (Name, Budget) = {
+                Finance, 20000
+                Sales, 30000
+                HR, 25000
+            }
+        '''
+        root = QueryNode()
+        root.string = 'select id > 1 ((Employees) {} (Department))'.format(TableOperator.CROSS_JOIN.symbol())
+        root.parse([Table(string1), Table(string2)])
+        self.assertFalse(root.table)
+        self.assertEqual(root.table_operator, TableOperator.SELECTION)
+        self.assertEqual(root.relational_operator, RelationalOperator.GREATER)
+        self.assertEqual(root.parameters, ['id', '1'])
+        self.assertEqual(len(root.nodes), 1)
+        self.assertFalse(root.nodes[0].table)
+        self.assertEqual(root.nodes[0].table_operator, TableOperator.CROSS_JOIN)
+        self.assertFalse(root.nodes[0].relational_operator)
+        self.assertFalse(root.nodes[0].parameters)
+        self.assertEqual(len(root.nodes[0].nodes), 2)
+        self.assertTrue(root.nodes[0].nodes[0].table)
+        self.assertFalse(root.nodes[0].nodes[0].table_operator)
+        self.assertFalse(root.nodes[0].nodes[0].relational_operator)
+        self.assertFalse(root.nodes[0].nodes[0].parameters)
+        self.assertFalse(root.nodes[0].nodes[0].nodes)
+        self.assertTrue(root.nodes[0].nodes[1].table)
+        self.assertFalse(root.nodes[0].nodes[1].table_operator)
+        self.assertFalse(root.nodes[0].nodes[1].relational_operator)
+        self.assertFalse(root.nodes[0].nodes[1].parameters)
+        self.assertFalse(root.nodes[0].nodes[1].nodes)
 
     def test_search1(self):
         self.assertEqual(QueryNode.search(' string ', 'string'), 1)

@@ -18,14 +18,14 @@ class RelationalOperator(enum.Enum):
     GREATER        = ('>',  operator.gt)
 
     def __init__(self, string, comparator):
-        ''' Create a new RelationalOperator. '''
+        ''''''
         self.string = string
         self.comparator = comparator
 
     def within(self, other):
-        ''' Check if string is contained in other. '''
+        ''''''
         return self.string and self.string in other
-    
+
     def __bool__(self):
-        ''' Check if valid. '''
+        ''''''
         return self != RelationalOperator.NONE

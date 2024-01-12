@@ -17,11 +17,11 @@ class TableOperator(enum.Enum):
     DIVISION         = (['\u00F7'])
 
     def __init__(self, strings):
-        ''' Create a new TableOperator. '''
+        ''''''
         self.strings = strings
 
     def __eq__(self, other):
-        ''' Compare by identifier or strings. '''
+        ''''''
         if isinstance(other, TableOperator):
             return self.value == other.value
         if isinstance(other, str):
@@ -29,5 +29,9 @@ class TableOperator(enum.Enum):
         raise AssertionError()
     
     def __bool__(self):
-        ''' Check if valid. '''
+        ''''''
         return self != TableOperator.NONE
+    
+    def symbol(self):
+        ''''''
+        return self.strings[0]
