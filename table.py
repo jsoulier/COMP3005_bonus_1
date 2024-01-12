@@ -102,3 +102,16 @@ class Table:
             result.rows = []
 
         return result
+
+    @staticmethod
+    def cross_join(table1, table2):
+
+        result = Table('')
+        result.columns = table1.columns + table2.columns
+
+        # Append rows together
+        for row1 in table1.rows:
+            for row2 in table2.rows:
+                result.rows.append(row1 + row2)
+
+        return result

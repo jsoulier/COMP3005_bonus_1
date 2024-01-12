@@ -3,6 +3,8 @@ import operator
 
 from table import Table
 
+# TODO: robustness test with bunch of white space and stuff
+
 class TestTable(unittest.TestCase):
     
     def test_init1(self):
@@ -111,3 +113,36 @@ class TestTable(unittest.TestCase):
         self.assertEqual(table.name, '')
         self.assertEqual(len(table.columns), 0)
         self.assertEqual(len(table.rows), 0)
+
+    def test_cross_join1(self):
+        string1 = '''
+            Employees (ID, Name, Age, Dept) = {
+                1, John, 32, Sales
+                2, Alice, 28, Finance
+                3, Bob, 29, HR
+            }
+        '''
+
+        string2 = '''
+            Department (Name, Budget) = {
+                Finance, 20000
+                Sales, 30000
+                HR, 25000
+            }
+        '''
+
+        table = Table.cross_join(Table(string1), Table(string2))
+
+        self.assertEqual(table.name, '')
+        self.assertEqual(len(table.columns), 6)
+        self.assertEqual(len(table.rows), 9)
+        self.assertEqual(table.columns, ['ID', 'Name', 'Age', 'Dept', 'Name', 'Budget'])
+        self.assertEqual(table.rows[0], [1, 'John', 32, 'Sales', 'Finance', 20000])
+        self.assertEqual(table.rows[1], [1, 'John', 32, 'Sales', 'Sales', 30000])
+        self.assertEqual(table.rows[2], [1, 'John', 32, 'Sales', 'HR', 25000])
+        self.assertEqual(table.rows[3], [2, 'Alice', 28, 'Finance', 'Finance', 20000])
+        self.assertEqual(table.rows[4], [2, 'Alice', 28, 'Finance', 'Sales', 30000])
+        self.assertEqual(table.rows[5], [2, 'Alice', 28, 'Finance', 'HR', 25000])
+        self.assertEqual(table.rows[6], [3, 'Bob', 29, 'HR', 'Finance', 20000])
+        self.assertEqual(table.rows[7], [3, 'Bob', 29, 'HR', 'Sales', 30000])
+        self.assertEqual(table.rows[8], [3, 'Bob', 29, 'HR', 'HR', 25000])
