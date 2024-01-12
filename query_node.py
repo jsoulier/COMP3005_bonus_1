@@ -2,6 +2,7 @@ import re
 
 from query_error import QueryError
 from relational_operator import RelationalOperator
+from table import Table
 from table_operator import TableOperator
 
 class QueryNode:
@@ -82,6 +83,18 @@ class QueryNode:
 
     def compute(self):
         ''' Compute the query. '''
+        # Essentially leaf nodes
+        if self.table:
+            return self.table
+
+        # Forward arguments to table functions
+        if self.table_operator == TableOperator.SELECTION:
+            return Table.selection(self.nodes[0].compute(), self.parameters[0], self.relational_operator.comparator, self.parameters[1])
+        if self.table_operator == TableOperator.PROJECTION:
+            return Table.projection(self.nodes[0].compute(), self.parameters)
+        if self.table_operator == TableOperator.CROSS_JOIN:
+            return Table.cross_join(self.nodes[0].compute(), self.nodes[1].compute())
+        raise AssertionError()
 
     @staticmethod
     def search(string1, string2):

@@ -66,6 +66,8 @@ class Table:
     def selection(table, column, comparator, value):
         ''' Perform a selection operation on the table. '''
 
+        if column not in table.columns:
+            raise TableError('Bad Selection: {}'.format(column))
         index = table.columns.index(column)
 
         result = Table('')
@@ -90,6 +92,8 @@ class Table:
 
         # Gather columns to remove
         for column in columns:
+            if column not in result.columns:
+                raise TableError('Bad Projection: {}'.format(column))
             indices.append(result.columns.index(column))
 
         # Remove columns
