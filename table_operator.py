@@ -21,7 +21,7 @@ class TableOperator(enum.Enum):
         self.strings = strings
 
     def __eq__(self, other):
-        ''''''
+        ''' Compare with other or check if strings contain other. '''
         if isinstance(other, TableOperator):
             return self.value == other.value
         if isinstance(other, str):

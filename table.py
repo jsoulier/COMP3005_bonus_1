@@ -5,7 +5,15 @@ from table_error import TableError
 from table_element import TableElement
 
 class Table:
-    ''' A structural representation of a table. '''
+    '''
+    A structural representation of a table.
+    Consists of:
+        - name of the table
+        - columns of the table
+        - rows of the table
+    The columns contain the names of the columns.
+    The rows contain the elements as table elements in row-major order.
+    '''
 
     def __init__(self, string):
         '''
@@ -30,7 +38,7 @@ class Table:
 
         string = string.replace(' ', '')
 
-        # Sanity check on the string
+        # Sanity check
         pattern = re.compile(r'[^a-zA-Z0-9{}(),.=_\-\n]')
         if pattern.search(string):
             raise TableError('Bad Characters: {}'.format(pattern.findall(string)))
@@ -64,8 +72,8 @@ class Table:
 
     @staticmethod
     def selection(table, column, comparator, value):
-        ''' Perform a selection operation on the table. '''
-
+        ''''''
+        # Get the column to compare
         if column not in table.columns:
             raise TableError('Bad Selection: {}'.format(column))
         index = table.columns.index(column)
@@ -82,15 +90,13 @@ class Table:
 
     @staticmethod
     def projection(table, columns):
-        ''' Perform a projection operation on the table. '''
-
-        indices = []
-
+        ''''''
         result = Table('')
         result.columns = copy.deepcopy(table.columns)
         result.rows = copy.deepcopy(table.rows)
 
         # Gather columns to remove
+        indices = []
         for column in columns:
             if column not in result.columns:
                 raise TableError('Bad Projection: {}'.format(column))
@@ -110,8 +116,7 @@ class Table:
 
     @staticmethod
     def cross_join(table1, table2):
-        ''' Perform a cross join operation on the tables. '''
-
+        ''''''
         result = Table('')
         result.columns = table1.columns + table2.columns
 
@@ -121,3 +126,43 @@ class Table:
                 result.rows.append(row1 + row2)
 
         return result
+
+    @staticmethod
+    def natural_join(table1, table2, column1, comparator, column2):
+        ''''''
+        raise NotImplementedError
+
+    @staticmethod
+    def left_outer_join(table1, table2, column1, comparator, column2):
+        ''''''
+        raise NotImplementedError
+
+    @staticmethod
+    def right_outer_join(table1, table2, column1, comparator, column2):
+        ''''''
+        raise NotImplementedError
+
+    @staticmethod
+    def full_outer_join(table1, table2, column1, comparator, column2):
+        ''''''
+        raise NotImplementedError
+
+    @staticmethod
+    def union(table1, table2):
+        ''''''
+        raise NotImplementedError
+
+    @staticmethod
+    def intersection(table1, table2):
+        ''''''
+        raise NotImplementedError
+
+    @staticmethod
+    def minus(table1, table2):
+        ''''''
+        raise NotImplementedError
+
+    @staticmethod
+    def division(table1, table2):
+        ''''''
+        raise NotImplementedError

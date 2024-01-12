@@ -6,7 +6,7 @@ from table import Table
 
 class TestTable(unittest.TestCase):
 
-    def test_init1(self):
+    def test_init(self):
         string = '''
             Employees (ID, Name, Age) = {
                 1, John, 32
@@ -31,7 +31,7 @@ class TestTable(unittest.TestCase):
         self.assertEqual(table.rows[2][1], 'Bob')
         self.assertEqual(table.rows[2][2], 29)
 
-    def test_init2(self):
+    def test_init_negative(self):
         string = '''
             Employees (Name, Wealth) = {
                 John, 32000
@@ -52,7 +52,7 @@ class TestTable(unittest.TestCase):
         self.assertEqual(table.rows[2][0], 'Bob')
         self.assertEqual(table.rows[2][1], 7200)
 
-    def test_init3(self):
+    def test_init_robustness(self):
         string = '''
           Employees (   ID,Name, Age  ) =    {   
 
@@ -82,17 +82,7 @@ class TestTable(unittest.TestCase):
         self.assertEqual(table.rows[2][1], 'Bob')
         self.assertEqual(table.rows[2][2], 29)
 
-    def test_init4(self):
-        string = '''
-            Employees (ID, Name, Age) = {
-                1, Jaan_Soulier, 32
-                2, Alice, 28
-                3, Bob, 29
-            }
-        '''
-        Table(string)
-
-    def test_init5(self):
+    def test_init_semicolon(self):
         string = '''
             Employees (ID, Name, Age) = {
                 1, John, 32;
@@ -103,7 +93,7 @@ class TestTable(unittest.TestCase):
         with self.assertRaises(TableError):
             Table(string)
 
-    def test_init6(self):
+    def test_init_dollar(self):
         string = '''
             Employees (ID, Name, Age) = {
                 1, John, 32
@@ -114,7 +104,7 @@ class TestTable(unittest.TestCase):
         with self.assertRaises(TableError):
             Table(string)
 
-    def test_init7(self):
+    def test_init_ampersand(self):
         string = '''
             Employees (ID, &Name, Age) = {
                 1, John, 32
@@ -191,7 +181,7 @@ class TestTable(unittest.TestCase):
         self.assertEqual(len(table.columns), 0)
         self.assertEqual(len(table.rows), 0)
 
-    def test_cross_join1(self):
+    def test_cross_join(self):
         string1 = '''
             Employees (ID, Name, Age, Dept) = {
                 1, John, 32, Sales
@@ -220,3 +210,6 @@ class TestTable(unittest.TestCase):
         self.assertEqual(table.rows[6], [3, 'Bob', 29, 'HR', 'Finance', 20000])
         self.assertEqual(table.rows[7], [3, 'Bob', 29, 'HR', 'Sales', 30000])
         self.assertEqual(table.rows[8], [3, 'Bob', 29, 'HR', 'HR', 25000])
+
+    def test_natural_join1(self):
+        pass

@@ -6,29 +6,35 @@ from table import Table
 from table_operator import TableOperator
 
 class QueryNode:
-    ''' A tree representation of a query. '''
+    '''
+    A tree representation of a query.
+    Consists of:
+        - child nodes (QueryNode)
+        - operator to apply to the child nodes (TableOperator)
+        - condition for the operator (RelationalOperator)
+        - parameters for the condition
+        - computed table (Table)
+    Every pair of parentheses is converted into a child node, creating a binary
+    tree-like structure.
+    Each child node will have a smaller query until we eventually find a table
+    allowing us to create a leaf node.
+    '''
 
-    def __init__(self):
+    def __init__(self, string):
         ''''''
-        self.string = ''
-
-        # The computed table
+        # For parsing
+        self.start = 0
+        self.end = 0
+        self.string = string
+        # For computing
         self.table = None
-
-        # The table operator and conditions on the table operator
         self.table_operator = TableOperator.NONE
         self.relational_operator = RelationalOperator.NONE
         self.parameters = []
-
-        # The range to prune from the parent
-        self.start = 0
-        self.end = 0
-
-        # The child nodes
         self.nodes = []
 
     def parse(self, tables):
-        ''' Parse string to create child nodes. '''
+        ''' Create child nodes, tables, and operators from the string and table. '''
         self.string = self.string.strip()
 
         # Check if node is a known table
@@ -82,23 +88,46 @@ class QueryNode:
             node.parse(tables)
 
     def compute(self):
-        ''' Compute the query. '''
-        # Essentially leaf nodes
+        ''' Compute the result of the query. Assumes we've already parsed the query. '''
+        # Check if node is a leaf node
         if self.table:
             return self.table
 
+        # Get table arguments
+        tables = []
+        for node in self.nodes:
+            tables.append(node.compute())
+        comparator = self.relational_operator.comparator
+        parameters = self.parameters
+
         # Forward arguments to table functions
         if self.table_operator == TableOperator.SELECTION:
-            return Table.selection(self.nodes[0].compute(), self.parameters[0], self.relational_operator.comparator, self.parameters[1])
+            return Table.selection(tables[0], parameters[0], comparator, parameters[1])
         if self.table_operator == TableOperator.PROJECTION:
-            return Table.projection(self.nodes[0].compute(), self.parameters)
+            return Table.projection(tables[0], parameters)
         if self.table_operator == TableOperator.CROSS_JOIN:
-            return Table.cross_join(self.nodes[0].compute(), self.nodes[1].compute())
+            return Table.cross_join(tables[0], tables[1])
+        if self.table_operator == TableOperator.NATURAL_JOIN:
+            return Table.natural_join(tables[0], tables[1], parameters[0], comparator, parameters[1])
+        if self.table_operator == TableOperator.LEFT_OUTER_JOIN:
+            return Table.left_outer_join(tables[0], tables[1], parameters[0], comparator, parameters[1])
+        if self.table_operator == TableOperator.RIGHT_OUTER_JOIN:
+            return Table.right_outer_join(tables[0], tables[1], parameters[0], comparator, parameters[1])
+        if self.table_operator == TableOperator.FULL_OUTER_JOIN:
+            return Table.full_outer_join(tables[0], tables[1], parameters[0], comparator, parameters[1])
+        if self.table_operator == TableOperator.UNION:
+            raise Table.union(tables[0], tables[1])
+        if self.table_operator == TableOperator.INTERSECTION:
+            raise Table.intersection(tables[0], tables[1])
+        if self.table_operator == TableOperator.MINUS:
+            raise Table.minus(tables[0], tables[1])
+        if self.table_operator == TableOperator.DIVISION:
+            raise Table.division(tables[0], tables[1])
         raise AssertionError()
 
     @staticmethod
     def search(string1, string2):
-        ''' Search for the first occurrence of string2 in string1. '''
+        ''' Get the index of the first occurrence of string2 in string1. '''
         # Check if the string is surrounded by spaces, parentheses, or boundaries
         pattern = r'(^|\s|\()' + re.escape(string2) + r'($|\s|\))'
         result = re.search(pattern, string1)
@@ -109,9 +138,10 @@ class QueryNode:
 
     @staticmethod
     def pair(string):
-        ''' Find the index of the parenthesis matching the first one. '''
+        ''' Find the index of the closing parenthesis matching the first one. '''
         count = 0
         for i, char in enumerate(string):
+            # Keep track of the parenthesis stack
             if char == '(':
                 count += 1
                 continue
@@ -128,12 +158,12 @@ class QueryNode:
     @classmethod
     def extract(cls, string):
         ''' Extract a node from a string. '''
-        node = QueryNode()
+        node = QueryNode('')
         node.start = string.find('(')
         if node.start == -1:
             return None
         node.end = cls.pair(string) + 1
-        # Create a substring from the parentheses
+        # Create a substring and strip off the parentheses
         node.string = string[node.start + 1:node.end - 1]
         node.string = node.string.strip()
         return node

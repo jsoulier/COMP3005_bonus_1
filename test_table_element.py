@@ -4,7 +4,7 @@ from table_element import TableElement
 
 class TestTableElement(unittest.TestCase):
 
-    def test1(self):
+    def test_compare(self):
         self.assertEqual(TableElement('string'), 'string')
         self.assertEqual(TableElement('1'), '1')
         self.assertEqual(TableElement('1'), 1)

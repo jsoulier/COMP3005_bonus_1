@@ -8,7 +8,7 @@ from table_operator import TableOperator
 
 class TestQueryNode(unittest.TestCase):
 
-    def test_parse1(self):
+    def test_parse(self):
         string = '''
             Employees (ID, Name, Age) = {
                 1, John, 32
@@ -16,22 +16,14 @@ class TestQueryNode(unittest.TestCase):
                 3, Bob, 29
             }
         '''
-        root1 = QueryNode()
-        root2 = QueryNode()
-        root3 = QueryNode()
-        root4 = QueryNode()
-        root5 = QueryNode()
-        root6 = QueryNode()
-        root7 = QueryNode()
-        root8 = QueryNode()
-        root1.string = 'pi name (Employees)'
-        root2.string = 'pi name (pi name, email (Employees))'
-        root3.string = 'select id > 1 (Employees)'
-        root4.string = 'pi name Employees'
-        root5.string = 'pi name (pi name, email Employees)'
-        root6.string = 'pi name (Employees)(Employees)'
-        root7.string = 'pi name (pi name, email (Employees)(Employees))'
-        root8.string = 'pi name (pi name, email (string))'
+        root1 = QueryNode('pi name (Employees)')
+        root2 = QueryNode('pi name (pi name, email (Employees))')
+        root3 = QueryNode('select id > 1 (Employees)')
+        root4 = QueryNode('pi name Employees')
+        root5 = QueryNode('pi name (pi name, email Employees)')
+        root6 = QueryNode('pi name (Employees)(Employees)')
+        root7 = QueryNode('pi name (pi name, email (Employees)(Employees))')
+        root8 = QueryNode('pi name (pi name, email (string))')
         root1.parse([Table(string)])
         root2.parse([Table(string)])
         root3.parse([Table(string)])
@@ -42,7 +34,7 @@ class TestQueryNode(unittest.TestCase):
             root7.parse([Table(string)])
             root8.parse([Table(string)])
 
-    def test_parse2(self):
+    def test_parse_projection(self):
         string = '''
             Employees (ID, Name, Age) = {
                 1, John, 32
@@ -50,8 +42,7 @@ class TestQueryNode(unittest.TestCase):
                 3, Bob, 29
             }
         '''
-        root = QueryNode()
-        root.string = 'pi name (Employees)'
+        root = QueryNode('pi name (Employees)')
         root.parse([Table(string)])
         self.assertFalse(root.table)
         self.assertEqual(root.table_operator, TableOperator.PROJECTION)
@@ -64,7 +55,7 @@ class TestQueryNode(unittest.TestCase):
         self.assertFalse(root.nodes[0].parameters)
         self.assertFalse(root.nodes[0].nodes)
 
-    def test_parse3(self):
+    def test_parse_projection_projection(self):
         string = '''
             Employees (ID, Name, Age) = {
                 1, John, 32
@@ -72,8 +63,7 @@ class TestQueryNode(unittest.TestCase):
                 3, Bob, 29
             }
         '''
-        root = QueryNode()
-        root.string = 'pi name (pi name, email (Employees))'
+        root = QueryNode('pi name (pi name, email (Employees))')
         root.parse([Table(string)])
         self.assertFalse(root.table)
         self.assertEqual(root.table_operator, TableOperator.PROJECTION)
@@ -91,7 +81,7 @@ class TestQueryNode(unittest.TestCase):
         self.assertFalse(root.nodes[0].nodes[0].parameters)
         self.assertFalse(root.nodes[0].nodes[0].nodes)
 
-    def test_parse4(self):
+    def test_parse_robustness(self):
         string = '''
             Employees (ID, Name, Age) = {
                 1, John, 32
@@ -99,8 +89,7 @@ class TestQueryNode(unittest.TestCase):
                 3, Bob, 29
             }
         '''
-        root = QueryNode()
-        root.string = '   pi name(   pi name   , email (  Employees  )  )  '
+        root = QueryNode('   pi name(   pi name   , email (  Employees  )  )  ')
         root.parse([Table(string)])
         self.assertFalse(root.table)
         self.assertEqual(root.table_operator, TableOperator.PROJECTION)
@@ -118,7 +107,7 @@ class TestQueryNode(unittest.TestCase):
         self.assertFalse(root.nodes[0].nodes[0].parameters)
         self.assertFalse(root.nodes[0].nodes[0].nodes)
 
-    def test_parse5(self):
+    def test_parse_selection(self):
         string = '''
             Employees (ID, Name, Age) = {
                 1, John, 32
@@ -126,8 +115,7 @@ class TestQueryNode(unittest.TestCase):
                 3, Bob, 29
             }
         '''
-        root = QueryNode()
-        root.string = 'select id > 1 (Employees)'
+        root = QueryNode('select id > 1 (Employees)')
         root.parse([Table(string)])
         self.assertFalse(root.table)
         self.assertEqual(root.table_operator, TableOperator.SELECTION)
@@ -140,7 +128,7 @@ class TestQueryNode(unittest.TestCase):
         self.assertFalse(root.nodes[0].parameters)
         self.assertFalse(root.nodes[0].nodes)
 
-    def test_parse6(self):
+    def test_parse_cross_join(self):
         string1 = '''
             Employees (ID, Name, Age, Dept) = {
                 1, John, 32, Sales
@@ -155,8 +143,7 @@ class TestQueryNode(unittest.TestCase):
                 HR, 25000
             }
         '''
-        root = QueryNode()
-        root.string = '(Employees) {} (Department)'.format(TableOperator.CROSS_JOIN.symbol())
+        root = QueryNode('(Employees) {} (Department)'.format(TableOperator.CROSS_JOIN.symbol()))
         root.parse([Table(string1), Table(string2)])
         self.assertFalse(root.table)
         self.assertEqual(root.table_operator, TableOperator.CROSS_JOIN)
@@ -174,7 +161,7 @@ class TestQueryNode(unittest.TestCase):
         self.assertFalse(root.nodes[1].parameters)
         self.assertFalse(root.nodes[1].nodes)
 
-    def test_parse7(self):
+    def test_parse_selection_cross_join(self):
         string1 = '''
             Employees (ID, Name, Age, Dept) = {
                 1, John, 32, Sales
@@ -189,8 +176,7 @@ class TestQueryNode(unittest.TestCase):
                 HR, 25000
             }
         '''
-        root = QueryNode()
-        root.string = 'select id > 1 ((Employees) {} (Department))'.format(TableOperator.CROSS_JOIN.symbol())
+        root = QueryNode('select id > 1 ((Employees) {} (Department))'.format(TableOperator.CROSS_JOIN.symbol()))
         root.parse([Table(string1), Table(string2)])
         self.assertFalse(root.table)
         self.assertEqual(root.table_operator, TableOperator.SELECTION)
@@ -213,7 +199,7 @@ class TestQueryNode(unittest.TestCase):
         self.assertFalse(root.nodes[0].nodes[1].parameters)
         self.assertFalse(root.nodes[0].nodes[1].nodes)
 
-    def test_compute1(self):
+    def test_compute_selection(self):
         string = '''
             Employees (ID, Name, Age) = {
                 1, John, 32
@@ -221,8 +207,7 @@ class TestQueryNode(unittest.TestCase):
                 3, Bob, 29
             }
         '''
-        root = QueryNode()
-        root.string = 'select ID >= 2 (Employees)'
+        root = QueryNode('select ID >= 2 (Employees)')
         root.parse([Table(string)])
         table = root.compute()
         self.assertEqual(len(table.columns), 3)
@@ -237,7 +222,7 @@ class TestQueryNode(unittest.TestCase):
         self.assertEqual(table.rows[1][1], 'Bob')
         self.assertEqual(table.rows[1][2], 29)
 
-    def test_compute2(self):
+    def test_compute_projection(self):
         string = '''
             Employees (ID, Name, Age) = {
                 1, John, 32
@@ -245,8 +230,7 @@ class TestQueryNode(unittest.TestCase):
                 3, Bob, 29
             }
         '''
-        root = QueryNode()
-        root.string = 'pi ID, Name (Employees)'
+        root = QueryNode('pi ID, Name (Employees)')
         root.parse([Table(string)])
         table = root.compute()
         self.assertEqual(len(table.columns), 1)
@@ -256,7 +240,7 @@ class TestQueryNode(unittest.TestCase):
         self.assertEqual(table.rows[1][0], 28)
         self.assertEqual(table.rows[2][0], 29)
 
-    def test_compute3(self):
+    def test_compute_cross_join(self):
         string1 = '''
             Employees (ID, Name, Age, Dept) = {
                 1, John, 32, Sales
@@ -271,8 +255,7 @@ class TestQueryNode(unittest.TestCase):
                 HR, 25000
             }
         '''
-        root = QueryNode()
-        root.string = '(Employees) {} (Department)'.format(TableOperator.CROSS_JOIN.symbol())
+        root = QueryNode('(Employees) {} (Department)'.format(TableOperator.CROSS_JOIN.symbol()))
         root.parse([Table(string1), Table(string2)])
         table = root.compute()
         self.assertEqual(table.name, '')
@@ -289,7 +272,7 @@ class TestQueryNode(unittest.TestCase):
         self.assertEqual(table.rows[7], [3, 'Bob', 29, 'HR', 'Sales', 30000])
         self.assertEqual(table.rows[8], [3, 'Bob', 29, 'HR', 'HR', 25000])
 
-    def test_search1(self):
+    def test_search(self):
         self.assertEqual(QueryNode.search(' string ', 'string'), 1)
         self.assertEqual(QueryNode.search('string ', 'string'), 0)
         self.assertEqual(QueryNode.search(' string', 'string'), 1)
@@ -299,7 +282,7 @@ class TestQueryNode(unittest.TestCase):
         self.assertEqual(QueryNode.search(' string2', 'string'), 8)
         self.assertEqual(QueryNode.search('(string2', 'string'), 8)
 
-    def test_pair1(self):
+    def test_pair(self):
         self.assertEqual(QueryNode.pair('()'), 1)
         self.assertEqual(QueryNode.pair('(  )'), 3)
         self.assertEqual(QueryNode.pair('(     ()   )'), 11)

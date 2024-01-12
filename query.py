@@ -1,11 +1,15 @@
 from query_node import QueryNode
 
 class Query:
-    ''' A wrapper for a QueryNode. '''
+    ''' A wrapper for a root QueryNode. '''
 
-    def __init__(self, string, tables):
+    def __init__(self):
         ''''''
-        self.root = QueryNode()
-        self.root.string = string
-        self.root.parse(tables)
-        self.root.compute()
+
+    def compute(self, string, tables):
+        ''' Compute the result of the query. '''
+        root = QueryNode(string)
+        # Create binary tree-like structure of nodes
+        root.parse(tables)
+        # Compute the table
+        return root.compute()
