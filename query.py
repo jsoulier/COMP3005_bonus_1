@@ -1,16 +1,12 @@
 import re
 
-from error import QueryError
-from misc import Misc
+from query_node import QueryNode
+from query_node_type import QueryNodeType
 
 class Query:
     """ A tree representation of a query. """
 
     def __init__(self, string, tables):
         """"""
-        pass
-
-    @staticmethod
-    def search(word):
-        """"""
-        pattern = r'(^|\s|\))' + re.escape(word) + r'($|\s|\()'
+        self.root = QueryNode(string, tables, QueryNodeType.NONE)
+        self.root.populate()

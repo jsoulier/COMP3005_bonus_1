@@ -1,7 +1,7 @@
 import copy
 import re
 
-from error import TableError
+from table_error import TableError
 from table_element import TableElement
 
 class Table:

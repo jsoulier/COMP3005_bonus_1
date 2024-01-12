@@ -2,6 +2,7 @@ import unittest
 
 from query import Query
 from table import Table
+from table_operator import TableOperator
 
 class TestQuery(unittest.TestCase):
 
@@ -13,7 +14,9 @@ class TestQuery(unittest.TestCase):
                 3, Bob, 29
             }
         '''
-        query = Query('select ID>1(Employees)', [Table(string)])
+        query = Query('pi name (Employee)', [Table(string)])
+        # self.assertEqual(query.table_operator, TableOperator.PROJECTION)
 
-    def test_search1(self):
-        pass
+
+
+        # query = Query('pi name (pi name, email (Employees))', [Table(string)])

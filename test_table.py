@@ -1,7 +1,7 @@
 import unittest
 import operator
 
-from error import TableError
+from table_error import TableError
 from table import Table
 
 class TestTable(unittest.TestCase):
