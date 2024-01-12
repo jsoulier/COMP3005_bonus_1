@@ -1,12 +1,8 @@
 import copy
 import re
 
+from error import TableError
 from table_element import TableElement
-
-class TableError(Exception):
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
 class Table:
     """ A structural representation of a table """
@@ -32,16 +28,19 @@ class Table:
         if not string:
             return
 
-        # Strip off all whitespace and leading newline characters
         string = string.replace(' ', '')
-        string = string.lstrip()
 
         # Sanity check on the string
         pattern = re.compile(r'[^a-zA-Z0-9{}(),.=\-\n]')
         if pattern.search(string):
             raise TableError('Bad Characters: {}'.format(pattern.findall(string)))
+        
+        # Remove empty lines
+        lines = []
+        for line in string.splitlines():
+            if line:
+                lines.append(line)
 
-        lines = string.splitlines()
         columns = lines[0]
         rows = lines[1:-1]
 
