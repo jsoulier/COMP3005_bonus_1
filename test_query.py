@@ -14,3 +14,6 @@ class TestQuery(unittest.TestCase):
             }
         '''
         query = Query('select ID>1(Employees)', [Table(string)])
+
+    def test_search1(self):
+        pass

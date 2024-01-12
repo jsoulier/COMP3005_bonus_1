@@ -1,5 +1,6 @@
 
 class Misc:
+    """ Miscellaneous constants and conversions. """
 
     SELECTION          = ['\u03C3', 'select']
     PROJECTION         = ['\u03C0']

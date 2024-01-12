@@ -32,7 +32,7 @@ class Table:
         string = string.replace(' ', '')
 
         # Sanity check on the string
-        pattern = re.compile(r'[^a-zA-Z0-9{}(),.=\-\n]')
+        pattern = re.compile(r'[^a-zA-Z0-9{}(),.=_\-\n]')
         if pattern.search(string):
             raise TableError('Bad Characters: {}'.format(pattern.findall(string)))
         
@@ -65,6 +65,7 @@ class Table:
 
     @staticmethod
     def selection(table, column, comparator, value):
+        """ Perform a selection operation on the table. """
 
         index = table.columns.index(column)
 
@@ -80,6 +81,7 @@ class Table:
 
     @staticmethod
     def projection(table, columns):
+        """ Perform a projection operation on the table. """
 
         indices = []
 
@@ -105,6 +107,7 @@ class Table:
 
     @staticmethod
     def cross_join(table1, table2):
+        """ Perform a cross join operation on the tables. """
 
         result = Table('')
         result.columns = table1.columns + table2.columns

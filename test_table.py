@@ -1,6 +1,7 @@
 import unittest
 import operator
 
+from error import TableError
 from table import Table
 
 class TestTable(unittest.TestCase):
@@ -14,7 +15,6 @@ class TestTable(unittest.TestCase):
             }
         '''
         table = Table(string)
-
         self.assertEqual(table.name, 'Employees')
         self.assertEqual(len(table.columns), 3)
         self.assertEqual(len(table.rows), 3)
@@ -40,7 +40,6 @@ class TestTable(unittest.TestCase):
             }
         '''
         table = Table(string)
-
         self.assertEqual(table.name, 'Employees')
         self.assertEqual(len(table.columns), 2)
         self.assertEqual(len(table.rows), 3)
@@ -67,7 +66,6 @@ class TestTable(unittest.TestCase):
 
         '''
         table = Table(string)
-
         self.assertEqual(table.name, 'Employees')
         self.assertEqual(len(table.columns), 3)
         self.assertEqual(len(table.rows), 3)
@@ -84,6 +82,49 @@ class TestTable(unittest.TestCase):
         self.assertEqual(table.rows[2][1], 'Bob')
         self.assertEqual(table.rows[2][2], 29)
 
+    def test_init4(self):
+        string = '''
+            Employees (ID, Name, Age) = {
+                1, Jaan_Soulier, 32
+                2, Alice, 28
+                3, Bob, 29
+            }
+        '''
+        Table(string)
+
+    def test_init5(self):
+        string = '''
+            Employees (ID, Name, Age) = {
+                1, John, 32;
+                2, Alice, 28
+                3, Bob, 29
+            }
+        '''
+        with self.assertRaises(TableError):
+            Table(string)
+
+    def test_init6(self):
+        string = '''
+            Employees (ID, Name, Age) = {
+                1, John, 32
+                2, Alice, $28
+                3, Bob, 29
+            }
+        '''
+        with self.assertRaises(TableError):
+            Table(string)
+
+    def test_init7(self):
+        string = '''
+            Employees (ID, &Name, Age) = {
+                1, John, 32
+                2, Alice, 28
+                3, Bob, 29
+            }
+        '''
+        with self.assertRaises(TableError):
+            Table(string)
+
     def test_selection1(self):
         string = '''
             Employees (ID, Name, Age) = {
@@ -93,7 +134,6 @@ class TestTable(unittest.TestCase):
             }
         '''
         table = Table.selection(Table(string), 'ID', operator.ge, 2)
-
         self.assertEqual(len(table.columns), 3)
         self.assertEqual(len(table.rows), 2)
         self.assertEqual(table.columns[0], 'ID')
@@ -106,6 +146,21 @@ class TestTable(unittest.TestCase):
         self.assertEqual(table.rows[1][1], 'Bob')
         self.assertEqual(table.rows[1][2], 29)
 
+    def test_selection2(self):
+        string = '''
+            Employees (ID, Name, Age) = {
+                1, John, 32
+                2, Alice, 28
+                3, Bob, 29
+            }
+        '''
+        table = Table.selection(Table(string), 'ID', operator.eq, 0)
+        self.assertEqual(len(table.columns), 3)
+        self.assertEqual(len(table.rows), 0)
+        self.assertEqual(table.columns[0], 'ID')
+        self.assertEqual(table.columns[1], 'Name')
+        self.assertEqual(table.columns[2], 'Age')
+
     def test_projection1(self):
         string = '''
             Employees (ID, Name, Age) = {
@@ -115,7 +170,6 @@ class TestTable(unittest.TestCase):
             }
         '''
         table = Table.projection(Table(string), ['ID', 'Name'])
-
         self.assertEqual(table.name, '')
         self.assertEqual(len(table.columns), 1)
         self.assertEqual(len(table.rows), 3)
@@ -133,7 +187,6 @@ class TestTable(unittest.TestCase):
             }
         '''
         table = Table.projection(Table(string), ['ID', 'Name', 'Age'])
-
         self.assertEqual(table.name, '')
         self.assertEqual(len(table.columns), 0)
         self.assertEqual(len(table.rows), 0)
@@ -154,7 +207,6 @@ class TestTable(unittest.TestCase):
             }
         '''
         table = Table.cross_join(Table(string1), Table(string2))
-
         self.assertEqual(table.name, '')
         self.assertEqual(len(table.columns), 6)
         self.assertEqual(len(table.rows), 9)
