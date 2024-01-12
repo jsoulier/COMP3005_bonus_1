@@ -3,24 +3,31 @@ import enum
 class TableOperator(enum.Enum):
     ''' The table operators and their textual representations. '''
 
-    NONE               = (0,  [])
-    SELECTION          = (1,  ['\u03C3', 'select'])
-    PROJECTION         = (2,  ['\u03C0', 'pi'])
-    CROSS_JOIN         = (3,  ['\u00D7'])
-    NATURAL_JOIN       = (4,  ['\u2A1D'])
-    LEFT_OUTER_JOIN    = (5,  ['\u27D5'])
-    RIGHT_OUTER_JOIN   = (6,  ['\u27D6'])
-    FULL_OUTER_JOIN    = (7,  ['\u27D7'])
-    UNION              = (8,  ['\u222A'])
-    INTERSECTION       = (9,  ['\u2229'])
-    MINUS              = (10, ['\u2212'])
-    DIVISION           = (11, ['\u00F7'])
+    NONE             = ([])
+    SELECTION        = (['\u03C3', 'select'])
+    PROJECTION       = (['\u03C0', 'pi'])
+    CROSS_JOIN       = (['\u00D7'])
+    NATURAL_JOIN     = (['\u2A1D'])
+    LEFT_OUTER_JOIN  = (['\u27D5'])
+    RIGHT_OUTER_JOIN = (['\u27D6'])
+    FULL_OUTER_JOIN  = (['\u27D7'])
+    UNION            = (['\u222A'])
+    INTERSECTION     = (['\u2229'])
+    MINUS            = (['\u2212'])
+    DIVISION         = (['\u00F7'])
 
-    def __init__(self, id, strings):
+    def __init__(self, strings):
         ''' Create a new TableOperator. '''
-        self.id = id
         self.strings = strings
 
     def __eq__(self, other):
-        ''' Compare by identifier. '''
-        return self.id == other.id
+        ''' Compare by identifier or strings. '''
+        if isinstance(other, TableOperator):
+            return self.value == other.value
+        if isinstance(other, str):
+            return other in self.strings
+        raise AssertionError()
+    
+    def __bool__(self):
+        ''' Check if valid. '''
+        return self != TableOperator.NONE

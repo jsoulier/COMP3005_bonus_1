@@ -1,6 +1,7 @@
 import re
 
 from query_error import QueryError
+from relational_operator import RelationalOperator
 from table_operator import TableOperator
 
 class QueryNode:
@@ -12,6 +13,11 @@ class QueryNode:
 
         # The computed table
         self.table = None
+
+        # The table operator and conditions on the table operator
+        self.table_operator = TableOperator.NONE
+        self.relational_operator = RelationalOperator.NONE
+        self.parameters = []
 
         # The range to prune from the parent
         self.start = 0
@@ -39,13 +45,43 @@ class QueryNode:
             self.string = self.string[:node.start] + self.string[node.end:]
             self.string = self.string.strip()
             self.nodes.append(node)
-
         if not self.nodes or len(self.nodes) > 2:
             raise QueryError('Bad Query: {}'.format(self.string))
+
+        # Separate the operator and parameters
+        strings = self.string.split(maxsplit=1)
+
+        # Find the table operator
+        for table_operator in TableOperator:
+            if table_operator != strings[0]:
+                continue
+            self.table_operator = table_operator
+            break
+        if not self.table_operator:
+            raise QueryError('Bad Query: {}'.format(self.string))
+
+        # Check for conditions on the table operator
+        if len(strings) > 1:
+
+            # Check for relational operator
+            for relational_operator in RelationalOperator:
+                if not relational_operator.within(strings[1]):
+                    continue
+                self.relational_operator = relational_operator
+                break
+
+            # Parse parameters
+            strings[1] = strings[1].replace(',', ' ')
+            if self.relational_operator:
+                strings[1] = strings[1].replace(self.relational_operator.string, ' ')
+            self.parameters = strings[1].split()
 
         # Parse child nodes
         for node in self.nodes:
             node.parse(tables)
+
+    def compute(self):
+        ''' Compute the query. '''
 
     @staticmethod
     def search(string1, string2):

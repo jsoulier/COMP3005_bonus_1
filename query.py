@@ -1,5 +1,3 @@
-import re
-
 from query_node import QueryNode
 
 class Query:
@@ -10,3 +8,4 @@ class Query:
         self.root = QueryNode()
         self.root.string = string
         self.root.parse(tables)
+        self.root.compute()
