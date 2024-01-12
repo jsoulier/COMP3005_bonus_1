@@ -1,11 +1,10 @@
-
 from error import QueryError
-from glyph import Glyph
+from misc import Misc
 from query_node import QueryNode
-from table import Table
 
-class Query:
-    """ A tree representation of a query """
+class Query(QueryNode):
+    """ A tree representation of a query. """
 
-    def __init__(self, string):
+    def __init__(self, string, tables):
+
         pass

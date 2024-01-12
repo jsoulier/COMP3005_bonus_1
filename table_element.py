@@ -1,13 +1,14 @@
 import operator
 
 class TableElement:
-    """ A wrapper for all the supported types in a table.
+    """
+    A wrapper for all the supported types in a table.
     The possible types include:
         - strings
         - integers
         - floats
-    The wrapper allows for the automatic comparison of string, integral, and floating types,
-    even when the other operand is a string.
+    The wrapper allows for the automatic comparison of string, integral, and floating
+    types, even when the other operand is a string.
     """
 
     def __init__(self, string):

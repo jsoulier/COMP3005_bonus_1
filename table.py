@@ -5,10 +5,11 @@ from error import TableError
 from table_element import TableElement
 
 class Table:
-    """ A structural representation of a table """
+    """ A structural representation of a table. """
 
     def __init__(self, string):
-        """ Construct a table from a textual representation.
+        """
+        Construct a table from a textual representation.
         e.g.
         Employees (ID, Name, Age) = {
             1, John, 32

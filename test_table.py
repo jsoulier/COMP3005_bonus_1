@@ -13,7 +13,6 @@ class TestTable(unittest.TestCase):
                 3, Bob, 29
             }
         '''
-
         table = Table(string)
 
         self.assertEqual(table.name, 'Employees')
@@ -40,7 +39,6 @@ class TestTable(unittest.TestCase):
                 Bob, 7200
             }
         '''
-
         table = Table(string)
 
         self.assertEqual(table.name, 'Employees')
@@ -68,7 +66,6 @@ class TestTable(unittest.TestCase):
             }
 
         '''
-
         table = Table(string)
 
         self.assertEqual(table.name, 'Employees')
@@ -95,7 +92,6 @@ class TestTable(unittest.TestCase):
                 3, Bob, 29
             }
         '''
-
         table = Table.selection(Table(string), 'ID', operator.ge, 2)
 
         self.assertEqual(len(table.columns), 3)
@@ -118,7 +114,6 @@ class TestTable(unittest.TestCase):
                 3, Bob, 29
             }
         '''
-
         table = Table.projection(Table(string), ['ID', 'Name'])
 
         self.assertEqual(table.name, '')
@@ -137,7 +132,6 @@ class TestTable(unittest.TestCase):
                 3, Bob, 29
             }
         '''
-
         table = Table.projection(Table(string), ['ID', 'Name', 'Age'])
 
         self.assertEqual(table.name, '')
@@ -152,7 +146,6 @@ class TestTable(unittest.TestCase):
                 3, Bob, 29, HR
             }
         '''
-
         string2 = '''
             Department (Name, Budget) = {
                 Finance, 20000
@@ -160,7 +153,6 @@ class TestTable(unittest.TestCase):
                 HR, 25000
             }
         '''
-
         table = Table.cross_join(Table(string1), Table(string2))
 
         self.assertEqual(table.name, '')

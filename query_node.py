@@ -1,3 +1,3 @@
 
 class QueryNode:
-    pass
+    """ A tree representation of an inner query. """
