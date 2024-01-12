@@ -8,8 +8,17 @@ class TableError(Exception):
         super().__init__(*args, **kwargs)
 
 class Table:
+    """ A structural representation of a table """
 
     def __init__(self, string):
+        """ Construct a table from a textual representation.
+        e.g.
+        Employees (ID, Name, Age) = {
+            1, John, 32
+            2, Alice, 28
+            3, Bob, 29
+        }
+        """
 
         # Strip off all whitespace and leading newline characters
         string = string.replace(' ', '')

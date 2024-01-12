@@ -1,7 +1,7 @@
 import operator
 
 class TableElement:
-    """ An wrapper for all the supported types in a table.
+    """ A wrapper for all the supported types in a table.
     The possible types include:
         - strings
         - integers
@@ -16,10 +16,13 @@ class TableElement:
     @staticmethod
     def convert(string):
         """ Try to convert the string to any of the supported types in a table. """
-        try:
-            return int(string)
-        except:
-            pass
+        # Converting a textual float to an int is invalid, but converting a float
+        # to an int is valid. We skip floats to avoid discarding the decimals.
+        if not isinstance(string, float):
+            try:
+                return int(string)
+            except:
+                pass
         try:
             return float(string)
         except:
