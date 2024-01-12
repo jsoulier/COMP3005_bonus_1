@@ -2,6 +2,7 @@ import enum
 
 class QueryNodeType(enum.Enum):
     NONE           = 0
-    TABLE          = 1
-    TABLE_OPERATOR = 2
-    GROUP          = 3
+    ROOT           = 1
+    TABLE          = 2
+    TABLE_OPERATOR = 3
+    GROUP          = 4

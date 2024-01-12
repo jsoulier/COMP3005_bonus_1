@@ -8,5 +8,4 @@ class Query:
 
     def __init__(self, string, tables):
         """"""
-        self.root = QueryNode(string, tables, QueryNodeType.NONE)
-        self.root.populate()
+        self.root = QueryNode(string, tables, QueryNodeType.ROOT)
