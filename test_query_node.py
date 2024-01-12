@@ -2,8 +2,6 @@ import unittest
 
 from query_error import QueryError
 from query_node import QueryNode
-from query_node_type import QueryNodeType
-from table import Table
 
 class TestQueryNode(unittest.TestCase):
 
@@ -17,17 +15,19 @@ class TestQueryNode(unittest.TestCase):
         self.assertEqual(QueryNode.search(' string2', 'string'), 8)
         self.assertEqual(QueryNode.search('(string2', 'string'), 8)
 
-    def test_create1(self):
-        string = '''
-            Employees (ID, Name, Age) = {
-                1, John, 32
-                2, Alice, 28
-                3, Bob, 29
-            }
-        '''
-        self.assertEqual(QueryNode.create('Employees', [Table(string)]).type, QueryNodeType.TABLE)
-        self.assertEqual(QueryNode.create('pi name (Employees)', [Table(string)]).type, QueryNodeType.TABLE_OPERATOR)
-        self.assertEqual(QueryNode.create('(Employees)', [Table(string)]).type, QueryNodeType.GROUP)
+    def test_extract(self):
+        node1 = QueryNode.extract('( string )')
+        node2 = QueryNode.extract('( string string )')
+        node3 = QueryNode.extract('( string ( string) )')
+        node4 = QueryNode.extract('( string ) string')
+        node5 = QueryNode.extract(' string ( string ) ')
+        node6 = QueryNode.extract(' string ( string ) string ')
+        self.assertEqual(node1.string, 'string')
+        self.assertEqual(node2.string, 'string string')
+        self.assertEqual(node3.string, 'string ( string)')
+        self.assertEqual(node4.string, 'string')
+        self.assertEqual(node5.string, 'string')
+        self.assertEqual(node6.string, 'string')
 
     def test_pair1(self):
         self.assertEqual(QueryNode.pair('()'), 1)

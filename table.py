@@ -5,10 +5,10 @@ from table_error import TableError
 from table_element import TableElement
 
 class Table:
-    """ A structural representation of a table. """
+    ''' A structural representation of a table. '''
 
     def __init__(self, string):
-        """
+        '''
         Construct a table from a textual representation.
         e.g.
         Employees (ID, Name, Age) = {
@@ -19,8 +19,7 @@ class Table:
         name = Employees
         columns = [ID, Name, Age]
         rows = [[1, John, 32], [2, Alice, 28], [3, Bob, 29]]
-        """
-
+        '''
         self.name = ''
         self.columns = []
         self.rows = []
@@ -65,7 +64,7 @@ class Table:
 
     @staticmethod
     def selection(table, column, comparator, value):
-        """ Perform a selection operation on the table. """
+        ''' Perform a selection operation on the table. '''
 
         index = table.columns.index(column)
 
@@ -81,7 +80,7 @@ class Table:
 
     @staticmethod
     def projection(table, columns):
-        """ Perform a projection operation on the table. """
+        ''' Perform a projection operation on the table. '''
 
         indices = []
 
@@ -107,7 +106,7 @@ class Table:
 
     @staticmethod
     def cross_join(table1, table2):
-        """ Perform a cross join operation on the tables. """
+        ''' Perform a cross join operation on the tables. '''
 
         result = Table('')
         result.columns = table1.columns + table2.columns
