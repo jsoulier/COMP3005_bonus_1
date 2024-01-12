@@ -35,23 +35,23 @@ class TableElement:
     def __repr__(self):
         return str(self.value)
 
-    def compare(self, other, comparator):
+    def compare(self, comparator, other):
         return comparator(self.value, self.convert(other))
     
     def __lt__(self, other):
-        return self.compare(other, operator.lt)
+        return self.compare(operator.lt, other)
     
     def __le__(self, other):
-        return self.compare(other, operator.le)
+        return self.compare(operator.le, other)
     
     def __eq__(self, other):
-        return self.compare(other, operator.eq)
+        return self.compare(operator.eq, other)
     
     def __ne__(self, other):
-        return self.compare(other, operator.ne)
+        return self.compare(operator.ne, other)
     
     def __ge__(self, other):
-        return self.compare(other, operator.ge)
+        return self.compare(operator.ge, other)
     
     def __gt__(self, other):
-        return self.compare(other, operator.gt)
+        return self.compare(operator.gt, other)
