@@ -15,6 +15,17 @@ class TestQueryNode(unittest.TestCase):
         self.assertEqual(QueryNode.search(' string2', 'string'), 8)
         self.assertEqual(QueryNode.search('(string2', 'string'), 8)
 
+    def test_pair1(self):
+        self.assertEqual(QueryNode.pair('()'), 1)
+        self.assertEqual(QueryNode.pair('(  )'), 3)
+        self.assertEqual(QueryNode.pair('(     ()   )'), 11)
+        self.assertEqual(QueryNode.pair('(     ()   )  ()'), 11)
+        with self.assertRaises(QueryError):
+            self.assertEqual(QueryNode.pair(''), 0)
+            self.assertEqual(QueryNode.pair(')'), 0)
+            self.assertEqual(QueryNode.pair(')()'), 0)
+        self.assertEqual(QueryNode.pair('pi name (Employees)'), 18)
+
     def test_extract(self):
         node1 = QueryNode.extract('( string )')
         node2 = QueryNode.extract('( string string )')
@@ -28,14 +39,3 @@ class TestQueryNode(unittest.TestCase):
         self.assertEqual(node4.string, 'string')
         self.assertEqual(node5.string, 'string')
         self.assertEqual(node6.string, 'string')
-
-    def test_pair1(self):
-        self.assertEqual(QueryNode.pair('()'), 1)
-        self.assertEqual(QueryNode.pair('(  )'), 3)
-        self.assertEqual(QueryNode.pair('(     ()   )'), 11)
-        self.assertEqual(QueryNode.pair('(     ()   )  ()'), 11)
-        with self.assertRaises(QueryError):
-            self.assertEqual(QueryNode.pair(''), 0)
-            self.assertEqual(QueryNode.pair(')'), 0)
-            self.assertEqual(QueryNode.pair(')()'), 0)
-        self.assertEqual(QueryNode.pair('pi name (Employees)'), 18)

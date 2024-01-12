@@ -3,11 +3,10 @@ import re
 from query_node import QueryNode
 
 class Query:
-    ''' A tree representation of a query. '''
+    ''' A wrapper for a QueryNode. '''
 
     def __init__(self, string, tables):
         ''''''
         self.root = QueryNode()
         self.root.string = string
-        self.root.tables = tables
-        self.root.parse()
+        self.root.parse(tables)

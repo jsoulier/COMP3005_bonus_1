@@ -1,6 +1,7 @@
 import unittest
 
 from query import Query
+from query_error import QueryError
 from table import Table
 from table_operator import TableOperator
 
@@ -16,6 +17,11 @@ class TestQuery(unittest.TestCase):
         '''
         query1 = Query('pi name (Employees)', [Table(string)])
         query2 = Query('pi name (pi name, email (Employees))', [Table(string)])
+        with self.assertRaises(QueryError):
+            Query('pi name Employees', [Table(string)])
+            Query('pi name (pi name, email Employees)', [Table(string)])
+            Query('pi name (Employees)(Employees)', [Table(string)])
+            Query('pi name (pi name, email (Employees)(Employees))', [Table(string)])
         self.assertEqual(query1.root.string, 'pi name')
         self.assertEqual(query1.root.nodes[0].string, 'Employees')
         self.assertEqual(query2.root.string, 'pi name')
