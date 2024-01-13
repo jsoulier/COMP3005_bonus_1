@@ -36,7 +36,7 @@ class TableOperator(enum.Enum):
     def __str__(self):
         ''''''
         if not self.strings:
-            return 'null'
+            return ''
         return self.strings[0]
 
     def parametric(self, count):

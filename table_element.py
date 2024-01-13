@@ -40,7 +40,7 @@ class TableElement:
     def compare(self, comparator, other):
         ''' Compare with any of the supported types using the selected operator. '''
         return comparator(self.value, self.convert(other))
-    
+
     def __lt__(self, other):
         ''''''
         return self.compare(operator.lt, other)

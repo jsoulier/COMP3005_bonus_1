@@ -2,6 +2,7 @@ import unittest
 
 from relational_operator import RelationalOperator
 from table import Table
+from table_element import TableElement
 from table_error import TableError
 
 class TestTable(unittest.TestCase):
@@ -317,3 +318,104 @@ class TestTable(unittest.TestCase):
         self.assertEqual(table.rows[0], [1, 'John', 32, 'Sales', 'Sales', 30000])
         self.assertEqual(table.rows[1], [2, 'Alice', 28, 'Finance', 'Finance', 20000])
         self.assertEqual(table.rows[2], [3, 'Bob', 29, 'HR', 'HR', 25000])
+
+    def test_natural_join2(self):
+        string1 = '''
+            Employees (ID, Name, Age, Dept) = {
+                1, John, 32, Sales
+                2, Alice, 28, Finance
+                3, Bob, 29, HR
+            }
+        '''
+        string2 = '''
+            Department (VP, Budget) = {
+                Finance, 20000
+                Sales, 30000
+                HR, 25000
+            }
+        '''
+        table = Table.natural_join(Table(string1), Table(string2), '', RelationalOperator.NONE, '')
+        self.assertEqual(table.name, '')
+        self.assertEqual(table.columns, ['ID', 'Name', 'Age', 'Dept', 'VP', 'Budget'])
+        self.assertEqual(table.rows[0], [1, 'John', 32, 'Sales', 'Finance', 20000])
+        self.assertEqual(table.rows[1], [1, 'John', 32, 'Sales', 'Sales', 30000])
+        self.assertEqual(table.rows[2], [1, 'John', 32, 'Sales', 'HR', 25000])
+        self.assertEqual(table.rows[3], [2, 'Alice', 28, 'Finance', 'Finance', 20000])
+        self.assertEqual(table.rows[4], [2, 'Alice', 28, 'Finance', 'Sales', 30000])
+        self.assertEqual(table.rows[5], [2, 'Alice', 28, 'Finance', 'HR', 25000])
+        self.assertEqual(table.rows[6], [3, 'Bob', 29, 'HR', 'Finance', 20000])
+        self.assertEqual(table.rows[7], [3, 'Bob', 29, 'HR', 'Sales', 30000])
+        self.assertEqual(table.rows[8], [3, 'Bob', 29, 'HR', 'HR', 25000])
+
+    def test_left_outer_join(self):
+        string1 = '''
+            Employees (ID, Name, Age, Dept) = {
+                1, John, 32, Sales
+                2, Alice, 28, Finance
+                3, Bob, 29, HR
+            }
+        '''
+        string2 = '''
+            Department (Dept, Budget) = {
+                Finance, 20000
+                Sales, 30000
+                IT, 25000
+            }
+        '''
+        table = Table.left_outer_join(Table(string1), Table(string2), '', RelationalOperator.NONE, '')
+        self.assertEqual(table.name, '')
+        self.assertEqual(len(table.columns), 6)
+        self.assertEqual(len(table.rows), 3)
+        self.assertEqual(table.columns, ['ID', 'Name', 'Age', 'Dept', 'Dept', 'Budget'])
+        self.assertEqual(table.rows[0], [1, 'John', 32, 'Sales', 'Sales', 30000])
+        self.assertEqual(table.rows[1], [2, 'Alice', 28, 'Finance', 'Finance', 20000])
+        self.assertEqual(table.rows[2], [3, 'Bob', 29, 'HR', '', ''])
+
+    def test_right_outer_join(self):
+        string1 = '''
+            Employees (ID, Name, Age, Dept) = {
+                1, John, 32, Sales
+                2, Alice, 28, Finance
+                3, Bob, 29, HR
+            }
+        '''
+        string2 = '''
+            Department (Dept, Budget) = {
+                Finance, 20000
+                Sales, 30000
+                IT, 25000
+            }
+        '''
+        table = Table.right_outer_join(Table(string1), Table(string2), '', RelationalOperator.NONE, '')
+        self.assertEqual(table.name, '')
+        self.assertEqual(len(table.columns), 6)
+        self.assertEqual(len(table.rows), 3)
+        self.assertEqual(table.columns, ['ID', 'Name', 'Age', 'Dept', 'Dept', 'Budget'])
+        self.assertEqual(table.rows[0], [1, 'John', 32, 'Sales', 'Sales', 30000])
+        self.assertEqual(table.rows[1], [2, 'Alice', 28, 'Finance', 'Finance', 20000])
+        self.assertEqual(table.rows[2], ['', '', '', '', 'IT', 25000])
+
+    def test_full_outer_join(self):
+        string1 = '''
+            Employees (ID, Name, Age, Dept) = {
+                1, John, 32, Sales
+                2, Alice, 28, Finance
+                3, Bob, 29, HR
+            }
+        '''
+        string2 = '''
+            Department (Dept, Budget) = {
+                Finance, 20000
+                Sales, 30000
+                IT, 25000
+            }
+        '''
+        table = Table.full_outer_join(Table(string1), Table(string2), '', RelationalOperator.NONE, '')
+        self.assertEqual(table.name, '')
+        self.assertEqual(len(table.columns), 6)
+        self.assertEqual(len(table.rows), 4)
+        self.assertEqual(table.columns, ['ID', 'Name', 'Age', 'Dept', 'Dept', 'Budget'])
+        self.assertEqual(table.rows[0], [1, 'John', 32, 'Sales', 'Sales', 30000])
+        self.assertEqual(table.rows[1], [2, 'Alice', 28, 'Finance', 'Finance', 20000])
+        self.assertEqual(table.rows[2], [3, 'Bob', 29, 'HR', '', ''])
+        self.assertEqual(table.rows[3], ['', '', '', '', 'IT', 25000])

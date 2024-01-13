@@ -151,9 +151,9 @@ class Table:
         # If parameters were specified
         if comparator:
             if column1 not in table1.columns:
-                raise TableError('Bad Natural Join: {} {} {}', column1, comparator, column2)
+                raise TableError('Bad Join: {} {} {}', column1, comparator, column2)
             if column2 not in table2.columns:
-                raise TableError('Bad Natural Join: {} {} {}', column1, comparator, column2)
+                raise TableError('Bad Join: {} {} {}', column1, comparator, column2)
             columns1 = [column1]
             columns2 = [column2]
 
@@ -161,9 +161,10 @@ class Table:
         else:
             comparator = RelationalOperator.EQUAL
             for column in table1.columns:
-                if column in table2.columns:
-                    columns1.append(column)
-                    columns2.append(column)
+                if column not in table2.columns:
+                    continue
+                columns1.append(column)
+                columns2.append(column)
 
         # Calculate indices
         indices1 = []
@@ -173,21 +174,30 @@ class Table:
         for column in columns2:
             indices2.append(table2.columns.index(column) + len(table1.columns))
 
+        # Calculate and record rows to remove
         table = Table.cross_join(table1, table2)
+        counts1 = len(table1.rows) * [0]
+        counts2 = len(table2.rows) * [0]
         indices = []
         for column1, column2 in zip(indices1, indices2):
             for i, row in enumerate(table.rows):
-                if not comparator(row[column1], row[column2]):
-                    indices.append(i)
-
+                if comparator(row[column1], row[column2]):
+                    continue
+                counts1[i // len(table1.rows)] += 1
+                counts2[i % len(table1.rows)] += 1
+                indices.append(i)
         for i in reversed(indices):
             table.rows.pop(i)
 
+        # Add back fully removed rows
         if type == TableOperator.LEFT_OUTER_JOIN or type == TableOperator.FULL_OUTER_JOIN:
-            pass
-
+            for count in counts1:
+                if count == len(table1.rows):
+                    table.rows.append(table1.rows[count - 1] + len(table2.columns) * [TableElement('')])
         if type == TableOperator.RIGHT_OUTER_JOIN or type == TableOperator.FULL_OUTER_JOIN:
-            pass
+            for count in counts2:
+                if count == len(table2.rows):
+                    table.rows.append(len(table1.columns) * [TableElement('')] + table2.rows[count - 1])
 
         return table
 
@@ -199,17 +209,17 @@ class Table:
     @staticmethod
     def left_outer_join(table1, table2, column1, comparator, column2):
         ''''''
-        raise NotImplementedError
+        return Table.join(table1, table2, column1, comparator, column2, TableOperator.LEFT_OUTER_JOIN)
 
     @staticmethod
     def right_outer_join(table1, table2, column1, comparator, column2):
         ''''''
-        raise NotImplementedError
+        return Table.join(table1, table2, column1, comparator, column2, TableOperator.RIGHT_OUTER_JOIN)
 
     @staticmethod
     def full_outer_join(table1, table2, column1, comparator, column2):
         ''''''
-        raise NotImplementedError
+        return Table.join(table1, table2, column1, comparator, column2, TableOperator.FULL_OUTER_JOIN)
 
     @staticmethod
     def union(table1, table2):
