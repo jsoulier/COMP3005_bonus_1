@@ -29,6 +29,7 @@ class TestQuery(unittest.TestCase):
         query.compute('select ID > 1 (Employees)', [Table(string1), Table(string2)])
         query.compute('(Employees) {} Name = Name (Department)'.format(TableOperator.NATURAL_JOIN), [Table(string1), Table(string2)])
         query.compute('   pi Name(   pi Name   ,Age (  Employees  )  )  ', [Table(string1), Table(string2)])
+        query.compute('pi Name (pi Name, Email Employees)', [Table(string1), Table(string2)])
 
     def test_parse2(self):
         string1 = '''
@@ -48,8 +49,6 @@ class TestQuery(unittest.TestCase):
         query = Query()
         with self.assertRaises(QueryError):
             query.compute('select ID > 1 1 (Employees)', [Table(string1), Table(string2)])
-        with self.assertRaises(QueryError):
-            query.compute('pi Name (pi Name, Email Employees)', [Table(string1), Table(string2)])
         with self.assertRaises(QueryError):
             query.compute('pi Name (Employees)(Employees)', [Table(string1), Table(string2)])
         with self.assertRaises(QueryError):
@@ -94,3 +93,18 @@ class TestQuery(unittest.TestCase):
         self.assertEqual(Query.parenthesize(' stringstring ', 'string'), ' stringstring ')
         self.assertEqual(Query.parenthesize('string2string', 'string'), 'string2string')
         self.assertEqual(Query.parenthesize(' string2 string', 'string'), ' string2 (string)')
+        self.assertEqual(Query.parenthesize(' string (string)', 'string'), ' (string) (string)')
+        self.assertEqual(Query.parenthesize(' string ( string )', 'string'), ' (string) ( string )')
+        self.assertEqual(Query.parenthesize(' string (string )', 'string'), ' (string) (string )')
+        self.assertEqual(Query.parenthesize(' string ( string)', 'string'), ' (string) ( string)')
+
+    def test_occurrences(self):
+        self.assertEqual(Query.occurrences(' string', 'string'), [1])
+        self.assertEqual(Query.occurrences('string', 'string'), [0])
+        self.assertEqual(Query.occurrences('stringstring', 'string'), [])
+        self.assertEqual(Query.occurrences('stringstring string', 'string'), [13])
+        self.assertEqual(Query.occurrences('string string', 'string'), [0, 7])
+        self.assertEqual(Query.occurrences(' sstring', 'string'), [])
+        self.assertEqual(Query.occurrences('', 'string'), [])
+        self.assertEqual(Query.occurrences(' strsing', 'string'), [])
+        self.assertEqual(Query.occurrences('string', ''), [])

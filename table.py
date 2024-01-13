@@ -283,5 +283,3 @@ class Table:
         for column in table1.columns[-len(table2.columns):]:
             if column not in table2.columns:
                 raise TableError()
-            
-        
