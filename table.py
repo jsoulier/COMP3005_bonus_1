@@ -103,21 +103,17 @@ class Table:
     def projection(table, columns):
         ''''''
         result = Table('')
-        result.columns = copy.deepcopy(table.columns)
-        result.rows = copy.deepcopy(table.rows)
 
-        # Gather columns to remove
+        # Gather columns to keep
         indices = []
         for column in columns:
-            if column not in result.columns:
-                raise TableError()
-            indices.append(result.columns.index(column))
+            if column in table.columns:
+                indices.append(table.columns.index(column))
 
-        # Remove columns
-        for index in reversed(indices):
-            result.columns.pop(index)
-            for row in result.rows:
-                row.pop(index)
+        # Add columns
+        for row in table.rows:
+            result.rows.append([row[i] for i in indices])
+        result.columns = [table.columns[i] for i in indices]
 
         # Clear the rows if there are no more columns
         if not result.columns:
@@ -176,19 +172,19 @@ class Table:
             indices2.append(table2.columns.index(column) + len(table1.columns))
 
         # Calculate and save rows to remove
-        table = Table.cross_join(table1, table2)
+        result = Table.cross_join(table1, table2)
         counts1 = len(table1.rows) * [0]
         counts2 = len(table2.rows) * [0]
         indices = []
         for column1, column2 in zip(indices1, indices2):
-            for i, row in enumerate(table.rows):
+            for i, row in enumerate(result.rows):
                 if comparator(row[column1], row[column2]):
                     continue
                 counts1[i // len(table1.rows)] += 1
                 counts2[i % len(table1.rows)] += 1
                 indices.append(i)
         for i in reversed(indices):
-            table.rows.pop(i)
+            result.rows.pop(i)
 
         # Try adding back fully removed rows
         empty1 = len(table2.columns) * [TableElement('')]
@@ -196,13 +192,13 @@ class Table:
         if type.left():
             for count in counts1:
                 if count == len(table1.rows):
-                    table.rows.append(table1.rows[count - 1] + empty1)
+                    result.rows.append(table1.rows[count - 1] + empty1)
         if type.right():
             for count in counts2:
                 if count == len(table2.rows):
-                    table.rows.append(empty2 + table2.rows[count - 1])
+                    result.rows.append(empty2 + table2.rows[count - 1])
 
-        return table
+        return result
 
     @staticmethod
     def natural_join(*args):
@@ -227,19 +223,65 @@ class Table:
     @staticmethod
     def union(table1, table2):
         ''''''
-        raise NotImplementedError()
+        # Ensure columns match
+        for column in table1.columns:
+            if column not in table2.columns:
+                raise TableError()
+
+        result = Table('')
+        result.columns = copy.deepcopy(table1.columns)
+        result.rows = copy.deepcopy(table1.rows)
+
+        # Add row if not already in the first table
+        for row in table2.rows:
+            if row not in table1.rows:
+                result.rows.append(row)
+
+        return result
 
     @staticmethod
     def intersection(table1, table2):
         ''''''
-        raise NotImplementedError()
+        # Ensure columns match
+        for column in table1.columns:
+            if column not in table2.columns:
+                raise TableError()
+            
+        result = Table('')
+        result.columns = copy.deepcopy(table1.columns)
+        
+        # Add row if in both tables
+        for row in table1.rows:
+            if row in table2.rows:
+                result.rows.append(row)
+
+        return result
 
     @staticmethod
     def minus(table1, table2):
         ''''''
-        raise NotImplementedError()
+        # Ensure columns match
+        for column in table1.columns:
+            if column not in table2.columns:
+                raise TableError()
+
+        result = Table('')
+        result.columns = copy.deepcopy(table1.columns)
+        result.rows = copy.deepcopy(table1.rows)
+
+        # Remove row if in first table
+        for row in table2.rows:
+            if row in result.rows:
+                result.rows.remove(row)
+
+        return result
 
     @staticmethod
     def division(table1, table2):
         ''''''
-        raise NotImplementedError()
+        # Ensure columns match
+        for column in table1.columns[-len(table2.columns):]:
+            if column not in table2.columns:
+                raise TableError()
+            
+        
