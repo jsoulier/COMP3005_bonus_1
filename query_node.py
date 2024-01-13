@@ -1,5 +1,3 @@
-import re
-
 from query_error import QueryError
 from relational_operator import RelationalOperator
 from table import Table
@@ -80,7 +78,7 @@ class QueryNode:
             # Parse parameters
             strings[1] = strings[1].replace(',', ' ')
             if self.relational_operator:
-                strings[1] = strings[1].replace(self.relational_operator.string, ' ')
+                strings[1] = strings[1].replace(str(self.relational_operator), ' ')
             self.parameters = strings[1].split()
 
         # Parse child nodes
@@ -97,7 +95,7 @@ class QueryNode:
         tables = []
         for node in self.nodes:
             tables.append(node.compute())
-        comparator = self.relational_operator.comparator
+        comparator = self.relational_operator
         parameters = self.parameters
 
         # Forward arguments to table functions
@@ -126,17 +124,6 @@ class QueryNode:
         raise AssertionError()
 
     @staticmethod
-    def search(string1, string2):
-        ''' Get the index of the first occurrence of string2 in string1. '''
-        # Check if the string is surrounded by spaces, parentheses, or boundaries
-        pattern = r'(^|\s|\()' + re.escape(string2) + r'($|\s|\))'
-        result = re.search(pattern, string1)
-        if not result:
-            return len(string1)
-        # Get the position of the string, not the position of the match
-        return result.start(1) + result.group().find(string2)
-
-    @staticmethod
     def pair(string):
         ''' Find the index of the closing parenthesis matching the first one. '''
         count = 0
@@ -155,14 +142,14 @@ class QueryNode:
                 break
         raise QueryError('Unmatched Parentheses: {}'.format(string))
 
-    @classmethod
-    def extract(cls, string):
+    @staticmethod
+    def extract(string):
         ''' Extract a node from a string. '''
         node = QueryNode('')
         node.start = string.find('(')
         if node.start == -1:
             return None
-        node.end = cls.pair(string) + 1
+        node.end = QueryNode.pair(string) + 1
         # Create a substring and strip off the parentheses
         node.string = string[node.start + 1:node.end - 1]
         node.string = node.string.strip()

@@ -17,6 +17,11 @@ class RelationalOperator(enum.Enum):
     LESS           = ('<',  operator.lt)
     GREATER        = ('>',  operator.gt)
 
+    # Some aliases
+    LESS_EQUAL     = LESS_EQUAL1
+    GREATER_EQUAL  = GREATER_EQUAL1
+    EQUAL          = EQUAL1
+
     def __init__(self, string, comparator):
         ''''''
         self.string = string
@@ -25,6 +30,18 @@ class RelationalOperator(enum.Enum):
     def within(self, other):
         ''''''
         return self.string and self.string in other
+
+    def __str__(self):
+        ''''''
+        return self.string
+
+    def __repr__(self):
+        ''''''
+        return self.string
+
+    def __call__(self, a, b):
+        ''''''
+        return self.comparator(a, b)
 
     def __bool__(self):
         ''''''

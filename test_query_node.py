@@ -272,16 +272,6 @@ class TestQueryNode(unittest.TestCase):
         self.assertEqual(table.rows[7], [3, 'Bob', 29, 'HR', 'Sales', 30000])
         self.assertEqual(table.rows[8], [3, 'Bob', 29, 'HR', 'HR', 25000])
 
-    def test_search(self):
-        self.assertEqual(QueryNode.search(' string ', 'string'), 1)
-        self.assertEqual(QueryNode.search('string ', 'string'), 0)
-        self.assertEqual(QueryNode.search(' string', 'string'), 1)
-        self.assertEqual(QueryNode.search('(string', 'string'), 1)
-        self.assertEqual(QueryNode.search(' string2 ', 'string'), 9)
-        self.assertEqual(QueryNode.search('string2 ', 'string'), 8)
-        self.assertEqual(QueryNode.search(' string2', 'string'), 8)
-        self.assertEqual(QueryNode.search('(string2', 'string'), 8)
-
     def test_pair(self):
         self.assertEqual(QueryNode.pair('()'), 1)
         self.assertEqual(QueryNode.pair('(  )'), 3)
@@ -294,15 +284,27 @@ class TestQueryNode(unittest.TestCase):
         self.assertEqual(QueryNode.pair('pi name (Employees)'), 18)
 
     def test_extract(self):
-        node1 = QueryNode.extract('( string )')
-        node2 = QueryNode.extract('( string string )')
-        node3 = QueryNode.extract('( string ( string) )')
-        node4 = QueryNode.extract('( string ) string')
-        node5 = QueryNode.extract(' string ( string ) ')
-        node6 = QueryNode.extract(' string ( string ) string ')
+        string1 = '( string )'
+        string2 = '( string string )'
+        string3 = '( string ( string) )'
+        string4 = '( string ) string'
+        string5 = ' string ( string ) '
+        string6 = ' string ( string )string '
+        node1 = QueryNode.extract(string1)
+        node2 = QueryNode.extract(string2)
+        node3 = QueryNode.extract(string3)
+        node4 = QueryNode.extract(string4)
+        node5 = QueryNode.extract(string5)
+        node6 = QueryNode.extract(string6)
         self.assertEqual(node1.string, 'string')
         self.assertEqual(node2.string, 'string string')
         self.assertEqual(node3.string, 'string ( string)')
         self.assertEqual(node4.string, 'string')
         self.assertEqual(node5.string, 'string')
         self.assertEqual(node6.string, 'string')
+        self.assertEqual(string1[:node1.start] + string1[node1.end:], '')
+        self.assertEqual(string2[:node2.start] + string2[node2.end:], '')
+        self.assertEqual(string3[:node3.start] + string3[node3.end:], '')
+        self.assertEqual(string4[:node4.start] + string4[node4.end:], ' string')
+        self.assertEqual(string5[:node5.start] + string5[node5.end:], ' string  ')
+        self.assertEqual(string6[:node6.start] + string6[node6.end:], ' string string ')

@@ -1,8 +1,8 @@
 import unittest
-import operator
 
-from table_error import TableError
+from relational_operator import RelationalOperator
 from table import Table
+from table_error import TableError
 
 class TestTable(unittest.TestCase):
 
@@ -123,7 +123,7 @@ class TestTable(unittest.TestCase):
                 3, Bob, 29
             }
         '''
-        table = Table.selection(Table(string), 'ID', operator.ge, 2)
+        table = Table.selection(Table(string), 'ID', RelationalOperator.GREATER_EQUAL, 2)
         self.assertEqual(len(table.columns), 3)
         self.assertEqual(len(table.rows), 2)
         self.assertEqual(table.columns[0], 'ID')
@@ -144,7 +144,7 @@ class TestTable(unittest.TestCase):
                 3, Bob, 29
             }
         '''
-        table = Table.selection(Table(string), 'ID', operator.eq, 0)
+        table = Table.selection(Table(string), 'ID', RelationalOperator.EQUAL, 0)
         self.assertEqual(len(table.columns), 3)
         self.assertEqual(len(table.rows), 0)
         self.assertEqual(table.columns[0], 'ID')
