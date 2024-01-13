@@ -47,6 +47,7 @@ class QueryNode:
             node = self.extract(self.string)
             if not node:
                 break
+            node.parse(tables)
             self.string = self.string[:node.start] + self.string[node.end:]
             self.string = self.string.strip()
             self.nodes.append(node)
@@ -81,13 +82,9 @@ class QueryNode:
                 strings[1] = strings[1].replace(str(self.relational_operator), ' ')
             self.parameters = strings[1].split()
 
-        # Ensure valid number of parameters for relational operator
+        # Ensure valid number of parameters
         if not self.table_operator.parametric(len(self.parameters)):
             raise QueryError('Bad Query: {}'.format(self.string))
-
-        # Parse child nodes
-        for node in self.nodes:
-            node.parse(tables)
 
     def compute(self):
         ''' Compute the result of the query. Assumes we've already parsed the query. '''

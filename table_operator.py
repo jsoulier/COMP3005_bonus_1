@@ -33,8 +33,10 @@ class TableOperator(enum.Enum):
         ''''''
         return self != TableOperator.NONE
 
-    def symbol(self):
+    def __str__(self):
         ''''''
+        if not self.strings:
+            return 'null'
         return self.strings[0]
 
     def parametric(self, count):

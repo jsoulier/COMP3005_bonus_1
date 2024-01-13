@@ -9,37 +9,49 @@ from table_operator import TableOperator
 class TestQueryNode(unittest.TestCase):
 
     def test_parse(self):
-        string = '''
-            Employees (ID, Name, Age) = {
-                1, John, 32
-                2, Alice, 28
-                3, Bob, 29
+        string1 = '''
+            Employees (ID, Name, Age, Dept) = {
+                1, John, 32, Sales
+                2, Alice, 28, Finance
+                3, Bob, 29, HR
             }
         '''
-        root1 = QueryNode('pi name (Employees)')
-        root2 = QueryNode('pi name (pi name, email (Employees))')
-        root3 = QueryNode('select id > 1 (Employees)')
-        root4 = QueryNode('pi name Employees')
-        root5 = QueryNode('pi name (pi name, email Employees)')
-        root6 = QueryNode('pi name (Employees)(Employees)')
-        root7 = QueryNode('pi name (pi name, email (Employees)(Employees))')
-        root8 = QueryNode('pi name (pi name, email (string))')
-        root9 = QueryNode('select id > 1 1 (Employees)')
-        root1.parse([Table(string)])
-        root2.parse([Table(string)])
-        root3.parse([Table(string)])
+        string2 = '''
+            Department (Name, Budget) = {
+                Finance, 20000
+                Sales, 30000
+                HR, 25000
+            }
+        '''
+        root1  = QueryNode('pi name (Employees)')
+        root2  = QueryNode('pi name (pi name, email (Employees))')
+        root3  = QueryNode('select id > 1 (Employees)')
+        root4  = QueryNode('pi name Employees')
+        root5  = QueryNode('pi name (pi name, email Employees)')
+        root6  = QueryNode('pi name (Employees)(Employees)')
+        root7  = QueryNode('pi name (pi name, email (Employees)(Employees))')
+        root8  = QueryNode('pi name (pi name, email (string))')
+        root9  = QueryNode('select id > 1 1 (Employees)')
+        root10 = QueryNode('(Employees) {} Name = Name (Department)'.format(TableOperator.NATURAL_JOIN))
+        root11 = QueryNode('(Employees) {} Name = Name Name (Department)'.format(TableOperator.NATURAL_JOIN))
+        root1.parse([Table(string1), Table(string2)])
+        root2.parse([Table(string1), Table(string2)])
+        root3.parse([Table(string1), Table(string2)])
         with self.assertRaises(QueryError):
-            root4.parse([Table(string)])
+            root4.parse([Table(string1), Table(string2)])
         with self.assertRaises(QueryError):
-            root5.parse([Table(string)])
+            root5.parse([Table(string1), Table(string2)])
         with self.assertRaises(QueryError):
-            root6.parse([Table(string)])
+            root6.parse([Table(string1), Table(string2)])
         with self.assertRaises(QueryError):
-            root7.parse([Table(string)])
+            root7.parse([Table(string1), Table(string2)])
         with self.assertRaises(QueryError):
-            root8.parse([Table(string)])
+            root8.parse([Table(string1), Table(string2)])
         with self.assertRaises(QueryError):
-            root9.parse([Table(string)])
+            root9.parse([Table(string1), Table(string2)])
+        root10.parse([Table(string1), Table(string2)])
+        with self.assertRaises(QueryError):
+            root11.parse([Table(string1), Table(string2)])
 
     def test_parse_projection(self):
         string = '''
@@ -150,7 +162,7 @@ class TestQueryNode(unittest.TestCase):
                 HR, 25000
             }
         '''
-        root = QueryNode('(Employees) {} (Department)'.format(TableOperator.CROSS_JOIN.symbol()))
+        root = QueryNode('(Employees) {} (Department)'.format(TableOperator.CROSS_JOIN))
         root.parse([Table(string1), Table(string2)])
         self.assertFalse(root.table)
         self.assertEqual(root.table_operator, TableOperator.CROSS_JOIN)
@@ -183,7 +195,7 @@ class TestQueryNode(unittest.TestCase):
                 HR, 25000
             }
         '''
-        root = QueryNode('select id > 1 ((Employees) {} (Department))'.format(TableOperator.CROSS_JOIN.symbol()))
+        root = QueryNode('select id > 1 ((Employees) {} (Department))'.format(TableOperator.CROSS_JOIN))
         root.parse([Table(string1), Table(string2)])
         self.assertFalse(root.table)
         self.assertEqual(root.table_operator, TableOperator.SELECTION)
@@ -262,7 +274,7 @@ class TestQueryNode(unittest.TestCase):
                 HR, 25000
             }
         '''
-        root = QueryNode('(Employees) {} (Department)'.format(TableOperator.CROSS_JOIN.symbol()))
+        root = QueryNode('(Employees) {} (Department)'.format(TableOperator.CROSS_JOIN))
         root.parse([Table(string1), Table(string2)])
         table = root.compute()
         self.assertEqual(table.name, '')
