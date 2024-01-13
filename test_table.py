@@ -52,6 +52,27 @@ class TestTable(unittest.TestCase):
         self.assertEqual(table.rows[2][0], 'Bob')
         self.assertEqual(table.rows[2][1], 7200)
 
+    def test_init_underscore(self):
+        string = '''
+            Employ_ees (Name_, _Wealth) = {
+                Jaan_Soulier, 32000
+                Alice, 64000
+                Bob, _7200
+            }
+        '''
+        table = Table(string)
+        self.assertEqual(table.name, 'Employ_ees')
+        self.assertEqual(len(table.columns), 2)
+        self.assertEqual(len(table.rows), 3)
+        self.assertEqual(table.columns[0], 'Name_')
+        self.assertEqual(table.columns[1], '_Wealth')
+        self.assertEqual(table.rows[0][0], 'Jaan_Soulier')
+        self.assertEqual(table.rows[0][1], 32000)
+        self.assertEqual(table.rows[1][0], 'Alice')
+        self.assertEqual(table.rows[1][1], 64000)
+        self.assertEqual(table.rows[2][0], 'Bob')
+        self.assertEqual(table.rows[2][1], '_7200')
+
     def test_init_robustness(self):
         string = '''
           Employees (   ID,Name, Age  ) =    {   
@@ -82,7 +103,30 @@ class TestTable(unittest.TestCase):
         self.assertEqual(table.rows[2][1], 'Bob')
         self.assertEqual(table.rows[2][2], 29)
 
-    def test_init_semicolon(self):
+    def test_init_bad1(self):
+        string = '''
+            Employees (ID, Name, Age) = {
+                1, Jaan Soulier, 32
+                2, Alice, 28
+                3, Bob, 29
+            }
+        '''
+        with self.assertRaises(TableError):
+            Table(string)
+
+    def test_init_bad2(self):
+        string = '''
+            Employees (ID, Name, Age) = {
+                1, John, 32
+                2, Alice, 28
+                3, Bob, 29
+                4, Mo
+            }
+        '''
+        with self.assertRaises(TableError):
+            Table(string)
+
+    def test_init_bad3(self):
         string = '''
             Employees (ID, Name, Age) = {
                 1, John, 32;
@@ -93,7 +137,7 @@ class TestTable(unittest.TestCase):
         with self.assertRaises(TableError):
             Table(string)
 
-    def test_init_dollar(self):
+    def test_init_bad4(self):
         string = '''
             Employees (ID, Name, Age) = {
                 1, John, 32
@@ -104,9 +148,31 @@ class TestTable(unittest.TestCase):
         with self.assertRaises(TableError):
             Table(string)
 
-    def test_init_ampersand(self):
+    def test_init_bad5(self):
         string = '''
             Employees (ID, &Name, Age) = {
+                1, John, 32
+                2, Alice, 28
+                3, Bob, 29
+            }
+        '''
+        with self.assertRaises(TableError):
+            Table(string)
+
+    def test_init_bad6(self):
+        string = '''
+            Employees (ID, Name Name, Age) = {
+                1, John, 32
+                2, Alice, 28
+                3, Bob, 29
+            }
+        '''
+        with self.assertRaises(TableError):
+            Table(string)
+
+    def test_init_bad7(self):
+        string = '''
+            Employees Employees (ID, Name Name, Age) = {
                 1, John, 32
                 2, Alice, 28
                 3, Bob, 29

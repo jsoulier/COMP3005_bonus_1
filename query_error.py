@@ -1,6 +1,6 @@
 
 class QueryError(Exception):
-    ''' Signifies an error in parsing a query. '''
+    ''' Signifies an error when parsing a query. '''
 
     def __init__(self, *args, **kwargs):
         ''''''

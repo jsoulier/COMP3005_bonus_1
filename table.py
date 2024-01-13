@@ -36,30 +36,34 @@ class Table:
         if not string:
             return
 
-        string = string.replace(' ', '')
-
-        # Sanity check
-        pattern = re.compile(r'[^a-zA-Z0-9{}(),.=_\-\n]')
+        # Sanity
+        pattern = re.compile(r'[^a-zA-Z0-9{}(),.=_\-\n\s]')
         if pattern.search(string):
             raise TableError('Bad Characters: {}'.format(pattern.findall(string)))
 
         # Remove empty lines
         lines = []
         for line in string.splitlines():
-            if line:
+            if line and not line.isspace():
                 lines.append(line)
 
         columns = lines[0]
         rows = lines[1:-1]
 
         # Strip the header until there is only the table and column titles
-        columns = columns.replace('(', ' ')
+        columns = columns.replace('(', ',')
         columns = columns.replace(')', ' ')
         columns = columns.replace('{', ' ')
-        columns = columns.replace('}', ' ')
         columns = columns.replace('=', ' ')
-        columns = columns.replace(',', ' ')
-        columns = columns.split()
+        columns = columns.split(',')
+
+        # Ensure column doesn't contain bad characters
+        pattern = re.compile(r'[^a-zA-Z0-9_]')
+        for i, column in enumerate(columns):
+            column = column.strip()
+            if pattern.search(column.strip()):
+                raise TableError('Bad Columns: {}'.format(lines[0]))
+            columns[i] = column
 
         self.name = columns[0]
         self.columns = columns[1:]
@@ -67,8 +71,12 @@ class Table:
 
         # Convert the rows of strings to rows of table elements
         for row in rows:
-            columns = row.split(',')
+            columns = row.replace(',', ' ').split()
             self.rows.append([TableElement(i) for i in columns])
+
+            # Ensure rows are the same length
+            if len(columns) != len(self.columns):
+                raise TableError('Bad Row: {}'.format(row))
 
     @staticmethod
     def selection(table, column, comparator, value):
