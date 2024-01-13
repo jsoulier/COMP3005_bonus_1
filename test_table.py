@@ -2,12 +2,11 @@ import unittest
 
 from relational_operator import RelationalOperator
 from table import Table
-from table_element import TableElement
 from table_error import TableError
 
 class TestTable(unittest.TestCase):
 
-    def test_init(self):
+    def test_init1(self):
         string = '''
             Employees (ID, Name, Age) = {
                 1, John, 32
@@ -32,7 +31,39 @@ class TestTable(unittest.TestCase):
         self.assertEqual(table.rows[2][1], 'Bob')
         self.assertEqual(table.rows[2][2], 29)
 
-    def test_init_negative(self):
+    def test_init2(self):
+        string = '''
+
+
+          Employees (   ID,Name, Age  ) =    {   
+
+             1, John,    32
+                  2,        Alice,      28
+
+                3,   Bob, 29   
+
+
+                            }
+
+        '''
+        table = Table(string)
+        self.assertEqual(table.name, 'Employees')
+        self.assertEqual(len(table.columns), 3)
+        self.assertEqual(len(table.rows), 3)
+        self.assertEqual(table.columns[0], 'ID')
+        self.assertEqual(table.columns[1], 'Name')
+        self.assertEqual(table.columns[2], 'Age')
+        self.assertEqual(table.rows[0][0], 1)
+        self.assertEqual(table.rows[0][1], 'John')
+        self.assertEqual(table.rows[0][2], 32)
+        self.assertEqual(table.rows[1][0], 2)
+        self.assertEqual(table.rows[1][1], 'Alice')
+        self.assertEqual(table.rows[1][2], 28)
+        self.assertEqual(table.rows[2][0], 3)
+        self.assertEqual(table.rows[2][1], 'Bob')
+        self.assertEqual(table.rows[2][2], 29)
+
+    def test_init3(self):
         string = '''
             Employees (Name, Wealth) = {
                 John, 32000
@@ -53,7 +84,7 @@ class TestTable(unittest.TestCase):
         self.assertEqual(table.rows[2][0], 'Bob')
         self.assertEqual(table.rows[2][1], 7200)
 
-    def test_init_underscore(self):
+    def test_init4(self):
         string = '''
             Employ_ees (Name_, _Wealth) = {
                 Jaan_Soulier, 32000
@@ -74,37 +105,7 @@ class TestTable(unittest.TestCase):
         self.assertEqual(table.rows[2][0], 'Bob')
         self.assertEqual(table.rows[2][1], '_7200')
 
-    def test_init_robustness(self):
-        string = '''
-          Employees (   ID,Name, Age  ) =    {   
-
-             1, John,    32
-                  2,        Alice,      28
-
-                3,   Bob, 29   
-
-
-            }
-
-        '''
-        table = Table(string)
-        self.assertEqual(table.name, 'Employees')
-        self.assertEqual(len(table.columns), 3)
-        self.assertEqual(len(table.rows), 3)
-        self.assertEqual(table.columns[0], 'ID')
-        self.assertEqual(table.columns[1], 'Name')
-        self.assertEqual(table.columns[2], 'Age')
-        self.assertEqual(table.rows[0][0], 1)
-        self.assertEqual(table.rows[0][1], 'John')
-        self.assertEqual(table.rows[0][2], 32)
-        self.assertEqual(table.rows[1][0], 2)
-        self.assertEqual(table.rows[1][1], 'Alice')
-        self.assertEqual(table.rows[1][2], 28)
-        self.assertEqual(table.rows[2][0], 3)
-        self.assertEqual(table.rows[2][1], 'Bob')
-        self.assertEqual(table.rows[2][2], 29)
-
-    def test_init_raise1(self):
+    def test_init5(self):
         string = '''
             Employees (ID, Name, Age) = {
                 1, Jaan Soulier, 32
@@ -115,7 +116,7 @@ class TestTable(unittest.TestCase):
         with self.assertRaises(TableError):
             Table(string)
 
-    def test_init_raise2(self):
+    def test_init6(self):
         string = '''
             Employees (ID, Name, Age) = {
                 1, John, 32
@@ -127,7 +128,7 @@ class TestTable(unittest.TestCase):
         with self.assertRaises(TableError):
             Table(string)
 
-    def test_init_raise3(self):
+    def test_init7(self):
         string = '''
             Employees (ID, Name, Age) = {
                 1, John, 32;
@@ -138,7 +139,7 @@ class TestTable(unittest.TestCase):
         with self.assertRaises(TableError):
             Table(string)
 
-    def test_init_raise4(self):
+    def test_init8(self):
         string = '''
             Employees (ID, Name, Age) = {
                 1, John, 32
@@ -149,7 +150,7 @@ class TestTable(unittest.TestCase):
         with self.assertRaises(TableError):
             Table(string)
 
-    def test_init_raise5(self):
+    def test_init9(self):
         string = '''
             Employees (ID, &Name, Age) = {
                 1, John, 32
@@ -160,7 +161,7 @@ class TestTable(unittest.TestCase):
         with self.assertRaises(TableError):
             Table(string)
 
-    def test_init_raise6(self):
+    def test_init10(self):
         string = '''
             Employees (ID, Name Name, Age) = {
                 1, John, 32
@@ -171,13 +172,46 @@ class TestTable(unittest.TestCase):
         with self.assertRaises(TableError):
             Table(string)
 
-    def test_init_raise7(self):
+    def test_init11(self):
         string = '''
             Employees Employees (ID, Name Name, Age) = {
                 1, John, 32
                 2, Alice, 28
                 3, Bob, 29
             }
+        '''
+        with self.assertRaises(TableError):
+            Table(string)
+
+    def test_init12(self):
+        string = '''
+            Employees (ID, Name, Age) = {
+            }
+        '''
+        table = Table(string)
+        self.assertEqual(table.name, 'Employees')
+        self.assertEqual(len(table.columns), 3)
+        self.assertEqual(len(table.rows), 0)
+        self.assertEqual(table.columns[0], 'ID')
+        self.assertEqual(table.columns[1], 'Name')
+        self.assertEqual(table.columns[2], 'Age')
+
+    def test_init13(self):
+        string = '''
+            Employees () = {
+            }
+        '''
+        table = Table(string)
+        self.assertEqual(table.name, 'Employees')
+        self.assertEqual(len(table.columns), 0)
+        self.assertEqual(len(table.rows), 0)
+
+    def test_init14(self):
+        string = '''
+            Employees () = {
+                1, John, 32
+                2, Alice, 28
+                3, Bob, 29  }
         '''
         with self.assertRaises(TableError):
             Table(string)
@@ -226,6 +260,27 @@ class TestTable(unittest.TestCase):
                 3, Bob, 29
             }
         '''
+        table = Table.projection(Table(string), ['Name'])
+        self.assertEqual(table.name, '')
+        self.assertEqual(len(table.columns), 2)
+        self.assertEqual(len(table.rows), 3)
+        self.assertEqual(table.columns[0], 'ID')
+        self.assertEqual(table.columns[1], 'Age')
+        self.assertEqual(table.rows[0][0], 1)
+        self.assertEqual(table.rows[1][0], 2)
+        self.assertEqual(table.rows[2][0], 3)
+        self.assertEqual(table.rows[0][1], 32)
+        self.assertEqual(table.rows[1][1], 28)
+        self.assertEqual(table.rows[2][1], 29)
+
+    def test_projection2(self):
+        string = '''
+            Employees (ID, Name, Age) = {
+                1, John, 32
+                2, Alice, 28
+                3, Bob, 29
+            }
+        '''
         table = Table.projection(Table(string), ['ID', 'Name'])
         self.assertEqual(table.name, '')
         self.assertEqual(len(table.columns), 1)
@@ -235,7 +290,7 @@ class TestTable(unittest.TestCase):
         self.assertEqual(table.rows[1][0], 28)
         self.assertEqual(table.rows[2][0], 29)
 
-    def test_projection2(self):
+    def test_projection3(self):
         string = '''
             Employees (ID, Name, Age) = {
                 1, John, 32

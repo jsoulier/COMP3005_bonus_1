@@ -43,17 +43,17 @@ class QueryNode:
             return
 
         # Create child nodes
+        string = self.string
         for i in range(2):
-            node = self.extract(self.string)
+            node = self.extract(string)
             if not node:
                 break
             node.parse(tables)
-            self.string = self.string[:node.start] + self.string[node.end:]
-            self.string = self.string.strip()
+            string = string[:node.start] + string[node.end:]
             self.nodes.append(node)
 
         # Separate the operator and parameters
-        strings = self.string.split(maxsplit=1)
+        strings = string.split(maxsplit=1)
 
         # Find the table operator
         for table_operator in TableOperator:
@@ -65,6 +65,15 @@ class QueryNode:
             raise QueryError()
         if self.table_operator.nodes != len(self.nodes):
             raise QueryError()
+
+        # Strip out right and maybe left node
+        if self.table_operator.nodes == 1:
+            self.string = self.string[:self.nodes[0].start]
+        if self.table_operator.nodes == 2:
+            self.string = self.string[self.nodes[0].end:self.nodes[0].end + self.nodes[1].start]
+
+        # Separate the operator and parameters, again...
+        strings = self.string.split(maxsplit=1)
 
         # Check for parameters
         if len(strings) > 1:
@@ -86,7 +95,7 @@ class QueryNode:
                 self.parameters.pop(index)
 
         # Ensure valid number of parameters
-        if not self.table_operator.parametric(len(self.parameters)):
+        if not self.table_operator.parametrize(len(self.parameters)):
             raise QueryError()
 
     def compute(self):

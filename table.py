@@ -53,11 +53,12 @@ class Table:
         rows = lines[1:-1]
 
         # Strip the header until there is only the table and column titles
-        columns = columns.replace('(', ',')
+        columns = columns.replace('(', ' ')
         columns = columns.replace(')', ' ')
         columns = columns.replace('{', ' ')
         columns = columns.replace('=', ' ')
-        columns = columns.split(',')
+        columns = columns.replace(',', ' ')
+        columns = columns.split()
 
         # Ensure column doesn't contain bad characters
         pattern = re.compile(r'[^a-zA-Z0-9_]')

@@ -8,7 +8,7 @@ from table_operator import TableOperator
 
 class TestQueryNode(unittest.TestCase):
 
-    def test_parse(self):
+    def test_parse1(self):
         string1 = '''
             Employees (ID, Name, Age, Dept) = {
                 1, John, 32, Sales
@@ -23,39 +23,70 @@ class TestQueryNode(unittest.TestCase):
                 HR, 25000
             }
         '''
-        root1 = QueryNode('pi name (Employees)')
-        root2 = QueryNode('pi name (pi name, email (Employees))')
+        root1 = QueryNode('pi Name (Employees)')
+        root2 = QueryNode('pi Name (pi Name, Email (Employees))')
         root3 = QueryNode('select ID > 1 (Employees)')
-        root4 = QueryNode('pi name Employees')
-        root5 = QueryNode('pi name (pi name, email Employees)')
-        root6 = QueryNode('pi name (Employees)(Employees)')
-        root7 = QueryNode('pi name (pi name, email (Employees)(Employees))')
-        root8 = QueryNode('pi name (pi name, email (string))')
-        root9 = QueryNode('select ID > 1 1 (Employees)')
-        root10 = QueryNode('(Employees) {} Name = Name (Department)'.format(TableOperator.NATURAL_JOIN))
-        root11 = QueryNode('(Employees) {} Name = Name Name (Department)'.format(TableOperator.NATURAL_JOIN))
-        root12 = QueryNode('(Employees) {} = Name Name (Department)'.format(TableOperator.NATURAL_JOIN))
-        root13 = QueryNode('(Employees) {} = Name (Department)'.format(TableOperator.NATURAL_JOIN))
-        root14 = QueryNode('(Employees) {} Name = (Department)'.format(TableOperator.NATURAL_JOIN))
-        root15 = QueryNode('(Employees) {} Name Name = (Department)'.format(TableOperator.NATURAL_JOIN))
-        root16 = QueryNode('(Employees) {} Name Name = Name (Department)'.format(TableOperator.NATURAL_JOIN))
-        root17 = QueryNode('(Employees) Name {} = Name (Department)'.format(TableOperator.NATURAL_JOIN))
+        root4 = QueryNode('(Employees) {} Name = Name (Department)'.format(TableOperator.NATURAL_JOIN))
+        root5 = QueryNode('   pi Name(   pi Name   ,Email (  Employees  )  )  ')
         root1.parse([Table(string1), Table(string2)])
         root2.parse([Table(string1), Table(string2)])
         root3.parse([Table(string1), Table(string2)])
-        root10.parse([Table(string1), Table(string2)])
+        root4.parse([Table(string1), Table(string2)])
+        root5.parse([Table(string1), Table(string2)])
+
+    def test_parse2(self):
+        string1 = '''
+            Employees (ID, Name, Age, Dept) = {
+                1, John, 32, Sales
+                2, Alice, 28, Finance
+                3, Bob, 29, HR
+            }
+        '''
+        string2 = '''
+            Department (Name, Budget) = {
+                Finance, 20000
+                Sales, 30000
+                HR, 25000
+            }
+        '''
+        root01 = QueryNode('select ID > 1 1 (Employees)')
+        root02 = QueryNode('pi Name Employees')
+        root03 = QueryNode('pi Name (pi Name, Email Employees)')
+        root04 = QueryNode('pi Name (Employees)(Employees)')
+        root05 = QueryNode('pi Name (pi Name, Email (Employees)(Employees))')
+        root06 = QueryNode('pi Name (pi Name, Email (string))')
+        root07 = QueryNode('(Employees) {} Name = Name Name (Department)'.format(TableOperator.NATURAL_JOIN))
+        root08 = QueryNode('(Employees) {} = Name Name (Department)'.format(TableOperator.NATURAL_JOIN))
+        root09 = QueryNode('(Employees) {} = Name (Department)'.format(TableOperator.NATURAL_JOIN))
+        root10 = QueryNode('(Employees) {} Name = (Department)'.format(TableOperator.NATURAL_JOIN))
+        root11 = QueryNode('(Employees) {} Name Name = (Department)'.format(TableOperator.NATURAL_JOIN))
+        root12 = QueryNode('(Employees) {} Name Name = Name (Department)'.format(TableOperator.NATURAL_JOIN))
+        root13 = QueryNode('(Employees) Name {} = Name (Department)'.format(TableOperator.NATURAL_JOIN))
+        root14 = QueryNode('pi (Employees) Name')
+        root15 = QueryNode('(Employees) pi Name')
+        root16 = QueryNode('(Employees)(Employees) pi Name')
+        root17 = QueryNode('(Employees) pi (Employees) Name')
+        root18 = QueryNode('(Employees) pi Name (Employees)')
         with self.assertRaises(QueryError):
-            root4.parse([Table(string1), Table(string2)])
+            root01.parse([Table(string1), Table(string2)])
         with self.assertRaises(QueryError):
-            root5.parse([Table(string1), Table(string2)])
+            root02.parse([Table(string1), Table(string2)])
         with self.assertRaises(QueryError):
-            root6.parse([Table(string1), Table(string2)])
+            root03.parse([Table(string1), Table(string2)])
         with self.assertRaises(QueryError):
-            root7.parse([Table(string1), Table(string2)])
+            root04.parse([Table(string1), Table(string2)])
         with self.assertRaises(QueryError):
-            root8.parse([Table(string1), Table(string2)])
+            root05.parse([Table(string1), Table(string2)])
         with self.assertRaises(QueryError):
-            root9.parse([Table(string1), Table(string2)])
+            root06.parse([Table(string1), Table(string2)])
+        with self.assertRaises(QueryError):
+            root07.parse([Table(string1), Table(string2)])
+        with self.assertRaises(QueryError):
+            root08.parse([Table(string1), Table(string2)])
+        with self.assertRaises(QueryError):
+            root09.parse([Table(string1), Table(string2)])
+        with self.assertRaises(QueryError):
+            root10.parse([Table(string1), Table(string2)])
         with self.assertRaises(QueryError):
             root11.parse([Table(string1), Table(string2)])
         with self.assertRaises(QueryError):
@@ -70,55 +101,10 @@ class TestQueryNode(unittest.TestCase):
             root16.parse([Table(string1), Table(string2)])
         with self.assertRaises(QueryError):
             root17.parse([Table(string1), Table(string2)])
+        with self.assertRaises(QueryError):
+            root18.parse([Table(string1), Table(string2)])
 
-    def test_parse_projection(self):
-        string = '''
-            Employees (ID, Name, Age) = {
-                1, John, 32
-                2, Alice, 28
-                3, Bob, 29
-            }
-        '''
-        root = QueryNode('pi name (Employees)')
-        root.parse([Table(string)])
-        self.assertFalse(root.table)
-        self.assertEqual(root.table_operator, TableOperator.PROJECTION)
-        self.assertFalse(root.relational_operator)
-        self.assertEqual(root.parameters, ['name'])
-        self.assertEqual(len(root.nodes), 1)
-        self.assertTrue(root.nodes[0].table)
-        self.assertFalse(root.nodes[0].table_operator)
-        self.assertFalse(root.nodes[0].relational_operator)
-        self.assertFalse(root.nodes[0].parameters)
-        self.assertFalse(root.nodes[0].nodes)
-
-    def test_parse_projection_projection(self):
-        string = '''
-            Employees (ID, Name, Age) = {
-                1, John, 32
-                2, Alice, 28
-                3, Bob, 29
-            }
-        '''
-        root = QueryNode('pi name (pi name, email (Employees))')
-        root.parse([Table(string)])
-        self.assertFalse(root.table)
-        self.assertEqual(root.table_operator, TableOperator.PROJECTION)
-        self.assertFalse(root.relational_operator)
-        self.assertEqual(root.parameters, ['name'])
-        self.assertEqual(len(root.nodes), 1)
-        self.assertFalse(root.nodes[0].table)
-        self.assertEqual(root.nodes[0].table_operator, TableOperator.PROJECTION)
-        self.assertFalse(root.nodes[0].relational_operator)
-        self.assertEqual(root.nodes[0].parameters, ['name', 'email'])
-        self.assertEqual(len(root.nodes[0].nodes), 1)
-        self.assertTrue(root.nodes[0].nodes[0].table)
-        self.assertFalse(root.nodes[0].nodes[0].table_operator)
-        self.assertFalse(root.nodes[0].nodes[0].relational_operator)
-        self.assertFalse(root.nodes[0].nodes[0].parameters)
-        self.assertFalse(root.nodes[0].nodes[0].nodes)
-
-    def test_parse_robustness(self):
+    def test_parse3(self):
         string = '''
             Employees (ID, Name, Age) = {
                 1, John, 32
@@ -144,7 +130,54 @@ class TestQueryNode(unittest.TestCase):
         self.assertFalse(root.nodes[0].nodes[0].parameters)
         self.assertFalse(root.nodes[0].nodes[0].nodes)
 
-    def test_parse_selection(self):
+    def test_parse4(self):
+        string = '''
+            Employees (ID, Name, Age) = {
+                1, John, 32
+                2, Alice, 28
+                3, Bob, 29
+            }
+        '''
+        root = QueryNode('pi name (Employees)')
+        root.parse([Table(string)])
+        self.assertFalse(root.table)
+        self.assertEqual(root.table_operator, TableOperator.PROJECTION)
+        self.assertFalse(root.relational_operator)
+        self.assertEqual(root.parameters, ['name'])
+        self.assertEqual(len(root.nodes), 1)
+        self.assertTrue(root.nodes[0].table)
+        self.assertFalse(root.nodes[0].table_operator)
+        self.assertFalse(root.nodes[0].relational_operator)
+        self.assertFalse(root.nodes[0].parameters)
+        self.assertFalse(root.nodes[0].nodes)
+
+    def test_parse5(self):
+        string = '''
+            Employees (ID, Name, Age) = {
+                1, John, 32
+                2, Alice, 28
+                3, Bob, 29
+            }
+        '''
+        root = QueryNode('pi name (pi name, email (Employees))')
+        root.parse([Table(string)])
+        self.assertFalse(root.table)
+        self.assertEqual(root.table_operator, TableOperator.PROJECTION)
+        self.assertFalse(root.relational_operator)
+        self.assertEqual(root.parameters, ['name'])
+        self.assertEqual(len(root.nodes), 1)
+        self.assertFalse(root.nodes[0].table)
+        self.assertEqual(root.nodes[0].table_operator, TableOperator.PROJECTION)
+        self.assertFalse(root.nodes[0].relational_operator)
+        self.assertEqual(root.nodes[0].parameters, ['name', 'email'])
+        self.assertEqual(len(root.nodes[0].nodes), 1)
+        self.assertTrue(root.nodes[0].nodes[0].table)
+        self.assertFalse(root.nodes[0].nodes[0].table_operator)
+        self.assertFalse(root.nodes[0].nodes[0].relational_operator)
+        self.assertFalse(root.nodes[0].nodes[0].parameters)
+        self.assertFalse(root.nodes[0].nodes[0].nodes)
+
+    def test_parse6(self):
         string = '''
             Employees (ID, Name, Age) = {
                 1, John, 32
@@ -165,7 +198,7 @@ class TestQueryNode(unittest.TestCase):
         self.assertFalse(root.nodes[0].parameters)
         self.assertFalse(root.nodes[0].nodes)
 
-    def test_parse_cross_join(self):
+    def test_parse7(self):
         string1 = '''
             Employees (ID, Name, Age, Dept) = {
                 1, John, 32, Sales
@@ -198,7 +231,7 @@ class TestQueryNode(unittest.TestCase):
         self.assertFalse(root.nodes[1].parameters)
         self.assertFalse(root.nodes[1].nodes)
 
-    def test_parse_selection_cross_join(self):
+    def test_parse8(self):
         string1 = '''
             Employees (ID, Name, Age, Dept) = {
                 1, John, 32, Sales
@@ -236,7 +269,7 @@ class TestQueryNode(unittest.TestCase):
         self.assertFalse(root.nodes[0].nodes[1].parameters)
         self.assertFalse(root.nodes[0].nodes[1].nodes)
 
-    def test_parse_natural_join_selection(self):
+    def test_parse9(self):
         string1 = '''
             Employees (ID, Name, Age, Dept) = {
                 1, John, 32, Sales
@@ -274,7 +307,7 @@ class TestQueryNode(unittest.TestCase):
         self.assertFalse(root.nodes[1].parameters)
         self.assertFalse(root.nodes[1].nodes)
 
-    def test_compute_selection(self):
+    def test_compute1(self):
         string = '''
             Employees (ID, Name, Age) = {
                 1, John, 32
@@ -297,7 +330,7 @@ class TestQueryNode(unittest.TestCase):
         self.assertEqual(table.rows[1][1], 'Bob')
         self.assertEqual(table.rows[1][2], 29)
 
-    def test_compute_projection(self):
+    def test_compute2(self):
         string = '''
             Employees (ID, Name, Age) = {
                 1, John, 32
@@ -315,7 +348,7 @@ class TestQueryNode(unittest.TestCase):
         self.assertEqual(table.rows[1][0], 28)
         self.assertEqual(table.rows[2][0], 29)
 
-    def test_compute_cross_join(self):
+    def test_compute3(self):
         string1 = '''
             Employees (ID, Name, Age, Dept) = {
                 1, John, 32, Sales
@@ -352,13 +385,15 @@ class TestQueryNode(unittest.TestCase):
         self.assertEqual(QueryNode.pair('(  )'), 3)
         self.assertEqual(QueryNode.pair('(     ()   )'), 11)
         self.assertEqual(QueryNode.pair('(     ()   )  ()'), 11)
+        self.assertEqual(QueryNode.pair('pi name (Employees)'), 18)
+        self.assertEqual(QueryNode.pair(' pi name   (Employees)   '), 21)
+        self.assertEqual(QueryNode.pair(' pi name   ( pi name ( Employees)     )   '), 38)
         with self.assertRaises(QueryError):
             self.assertEqual(QueryNode.pair(''), 0)
         with self.assertRaises(QueryError):
             self.assertEqual(QueryNode.pair(')'), 0)
         with self.assertRaises(QueryError):
             self.assertEqual(QueryNode.pair(')()'), 0)
-        self.assertEqual(QueryNode.pair('pi name (Employees)'), 18)
 
     def test_extract(self):
         string1 = '( string )'

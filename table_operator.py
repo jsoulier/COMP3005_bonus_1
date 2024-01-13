@@ -49,7 +49,7 @@ class TableOperator(enum.Enum):
         array = [TableOperator.RIGHT_OUTER_JOIN, TableOperator.FULL_OUTER_JOIN]
         return self in array
 
-    def parametric(self, count):
+    def parametrize(self, count):
         ''' Check if count is a valid number of parameters. '''
         if self == TableOperator.NONE:
             return count == 0

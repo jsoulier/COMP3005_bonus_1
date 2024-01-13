@@ -15,6 +15,20 @@ class TestRelationalOperator(unittest.TestCase):
         self.assertTrue(RelationalOperator.EQUAL2.within('= '))
         self.assertTrue(RelationalOperator.EQUAL2.within(' ='))
 
+    def test_call(self):
+        self.assertTrue(RelationalOperator.EQUAL(2, 2))
+        self.assertFalse(RelationalOperator.EQUAL(2, 1))
+        self.assertFalse(RelationalOperator.EQUAL(2, 3))
+        self.assertFalse(RelationalOperator.NOT_EQUAL(2, 2))
+        self.assertTrue(RelationalOperator.NOT_EQUAL(2, 1))
+        self.assertTrue(RelationalOperator.NOT_EQUAL(2, 3))
+        self.assertTrue(RelationalOperator.GREATER(3, 2))
+        self.assertFalse(RelationalOperator.GREATER(2, 3))
+        self.assertFalse(RelationalOperator.GREATER(3, 3))
+        self.assertTrue(RelationalOperator.GREATER_EQUAL(3, 2))
+        self.assertFalse(RelationalOperator.GREATER_EQUAL(2, 3))
+        self.assertTrue(RelationalOperator.GREATER_EQUAL(3, 3))
+
     def test_bool(self):
         self.assertFalse(RelationalOperator.NONE)
         self.assertTrue(RelationalOperator.EQUAL1)
