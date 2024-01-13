@@ -247,7 +247,7 @@ class TestTable(unittest.TestCase):
         self.assertEqual(len(table.columns), 0)
         self.assertEqual(len(table.rows), 0)
 
-    def test_cross_join(self):
+    def test_cross_join1(self):
         string1 = '''
             Employees (ID, Name, Age, Dept) = {
                 1, John, 32, Sales
@@ -277,5 +277,43 @@ class TestTable(unittest.TestCase):
         self.assertEqual(table.rows[7], [3, 'Bob', 29, 'HR', 'Sales', 30000])
         self.assertEqual(table.rows[8], [3, 'Bob', 29, 'HR', 'HR', 25000])
 
+    def test_cross_join2(self):
+        string1 = '''
+            Employees (ID, Name, Age, Dept) = {
+                1, John, 32, Sales
+                2, Alice, 28, Finance
+                3, Bob, 29, HR
+            }
+        '''
+        string2 = '''
+            Department (Name, Budget) = {
+                Finance, 20000
+                Sales, 30000
+            }
+        '''
+        with self.assertRaises(TableError):
+            Table.cross_join(Table(string1), Table(string2))
+
     def test_natural_join1(self):
-        pass
+        string1 = '''
+            Employees (ID, Name, Age, Dept) = {
+                1, John, 32, Sales
+                2, Alice, 28, Finance
+                3, Bob, 29, HR
+            }
+        '''
+        string2 = '''
+            Department (Dept, Budget) = {
+                Finance, 20000
+                Sales, 30000
+                HR, 25000
+            }
+        '''
+        table = Table.natural_join(Table(string1), Table(string2), '', RelationalOperator.NONE, '')
+        self.assertEqual(table.name, '')
+        self.assertEqual(len(table.columns), 6)
+        self.assertEqual(len(table.rows), 3)
+        self.assertEqual(table.columns, ['ID', 'Name', 'Age', 'Dept', 'Dept', 'Budget'])
+        self.assertEqual(table.rows[0], [1, 'John', 32, 'Sales', 'Sales', 30000])
+        self.assertEqual(table.rows[1], [2, 'Alice', 28, 'Finance', 'Finance', 20000])
+        self.assertEqual(table.rows[2], [3, 'Bob', 29, 'HR', 'HR', 25000])

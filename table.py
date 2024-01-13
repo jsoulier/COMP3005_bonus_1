@@ -1,8 +1,10 @@
 import copy
 import re
 
-from table_error import TableError
+from relational_operator import RelationalOperator
 from table_element import TableElement
+from table_error import TableError
+from table_operator import TableOperator
 
 class Table:
     '''
@@ -125,6 +127,11 @@ class Table:
     @staticmethod
     def cross_join(table1, table2):
         ''''''
+        count1 = len(table1.rows)
+        count2 = len(table2.rows)
+        if count1 != count2:
+            raise TableError('Bad Cross Join: Row Count {} != {}'.format(count1, count2))
+
         result = Table('')
         result.columns = table1.columns + table2.columns
 
@@ -136,9 +143,58 @@ class Table:
         return result
 
     @staticmethod
+    def join(table1, table2, column1, comparator, column2, type):
+        ''''''
+        columns1 = []
+        columns2 = []
+
+        # If parameters were specified
+        if comparator:
+            if column1 not in table1.columns:
+                raise TableError('Bad Natural Join: {} {} {}', column1, comparator, column2)
+            if column2 not in table2.columns:
+                raise TableError('Bad Natural Join: {} {} {}', column1, comparator, column2)
+            columns1 = [column1]
+            columns2 = [column2]
+
+        # If parameters were unspecified, find matching columns
+        else:
+            comparator = RelationalOperator.EQUAL
+            for column in table1.columns:
+                if column in table2.columns:
+                    columns1.append(column)
+                    columns2.append(column)
+
+        # Calculate indices
+        indices1 = []
+        indices2 = []
+        for column in columns1:
+            indices1.append(table1.columns.index(column))
+        for column in columns2:
+            indices2.append(table2.columns.index(column) + len(table1.columns))
+
+        table = Table.cross_join(table1, table2)
+        indices = []
+        for column1, column2 in zip(indices1, indices2):
+            for i, row in enumerate(table.rows):
+                if not comparator(row[column1], row[column2]):
+                    indices.append(i)
+
+        for i in reversed(indices):
+            table.rows.pop(i)
+
+        if type == TableOperator.LEFT_OUTER_JOIN or type == TableOperator.FULL_OUTER_JOIN:
+            pass
+
+        if type == TableOperator.RIGHT_OUTER_JOIN or type == TableOperator.FULL_OUTER_JOIN:
+            pass
+
+        return table
+
+    @staticmethod
     def natural_join(table1, table2, column1, comparator, column2):
         ''''''
-        raise NotImplementedError
+        return Table.join(table1, table2, column1, comparator, column2, TableOperator.NATURAL_JOIN)
 
     @staticmethod
     def left_outer_join(table1, table2, column1, comparator, column2):
