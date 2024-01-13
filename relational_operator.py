@@ -17,7 +17,7 @@ class RelationalOperator(enum.Enum):
     LESS           = ('<',  operator.lt)
     GREATER        = ('>',  operator.gt)
 
-    # Some aliases
+    # Aliases
     LESS_EQUAL     = LESS_EQUAL1
     GREATER_EQUAL  = GREATER_EQUAL1
     EQUAL          = EQUAL1

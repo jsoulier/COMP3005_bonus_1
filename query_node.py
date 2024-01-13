@@ -50,8 +50,6 @@ class QueryNode:
             self.string = self.string[:node.start] + self.string[node.end:]
             self.string = self.string.strip()
             self.nodes.append(node)
-        if not self.nodes or len(self.nodes) > 2:
-            raise QueryError('Bad Query: {}'.format(self.string))
 
         # Separate the operator and parameters
         strings = self.string.split(maxsplit=1)
@@ -63,6 +61,8 @@ class QueryNode:
             self.table_operator = table_operator
             break
         if not self.table_operator:
+            raise QueryError('Bad Query: {}'.format(self.string))
+        if self.table_operator.nodes != len(self.nodes):
             raise QueryError('Bad Query: {}'.format(self.string))
 
         # Check for conditions on the table operator
@@ -80,6 +80,10 @@ class QueryNode:
             if self.relational_operator:
                 strings[1] = strings[1].replace(str(self.relational_operator), ' ')
             self.parameters = strings[1].split()
+
+        # Ensure valid number of parameters for relational operator
+        if not self.table_operator.parametric(len(self.parameters)):
+            raise QueryError('Bad Query: {}'.format(self.string))
 
         # Parse child nodes
         for node in self.nodes:

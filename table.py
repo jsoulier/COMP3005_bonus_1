@@ -42,7 +42,7 @@ class Table:
         pattern = re.compile(r'[^a-zA-Z0-9{}(),.=_\-\n]')
         if pattern.search(string):
             raise TableError('Bad Characters: {}'.format(pattern.findall(string)))
-        
+
         # Remove empty lines
         lines = []
         for line in string.splitlines():

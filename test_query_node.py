@@ -24,15 +24,22 @@ class TestQueryNode(unittest.TestCase):
         root6 = QueryNode('pi name (Employees)(Employees)')
         root7 = QueryNode('pi name (pi name, email (Employees)(Employees))')
         root8 = QueryNode('pi name (pi name, email (string))')
+        root9 = QueryNode('select id > 1 1 (Employees)')
         root1.parse([Table(string)])
         root2.parse([Table(string)])
         root3.parse([Table(string)])
         with self.assertRaises(QueryError):
             root4.parse([Table(string)])
+        with self.assertRaises(QueryError):
             root5.parse([Table(string)])
+        with self.assertRaises(QueryError):
             root6.parse([Table(string)])
+        with self.assertRaises(QueryError):
             root7.parse([Table(string)])
+        with self.assertRaises(QueryError):
             root8.parse([Table(string)])
+        with self.assertRaises(QueryError):
+            root9.parse([Table(string)])
 
     def test_parse_projection(self):
         string = '''
@@ -279,7 +286,9 @@ class TestQueryNode(unittest.TestCase):
         self.assertEqual(QueryNode.pair('(     ()   )  ()'), 11)
         with self.assertRaises(QueryError):
             self.assertEqual(QueryNode.pair(''), 0)
+        with self.assertRaises(QueryError):
             self.assertEqual(QueryNode.pair(')'), 0)
+        with self.assertRaises(QueryError):
             self.assertEqual(QueryNode.pair(')()'), 0)
         self.assertEqual(QueryNode.pair('pi name (Employees)'), 18)
 

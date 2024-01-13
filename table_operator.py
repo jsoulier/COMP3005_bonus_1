@@ -3,21 +3,22 @@ import enum
 class TableOperator(enum.Enum):
     ''' The table operators and their textual representations. '''
 
-    NONE             = ([])
-    SELECTION        = (['\u03C3', 'select'])
-    PROJECTION       = (['\u03C0', 'pi'])
-    CROSS_JOIN       = (['\u00D7'])
-    NATURAL_JOIN     = (['\u2A1D'])
-    LEFT_OUTER_JOIN  = (['\u27D5'])
-    RIGHT_OUTER_JOIN = (['\u27D6'])
-    FULL_OUTER_JOIN  = (['\u27D7'])
-    UNION            = (['\u222A'])
-    INTERSECTION     = (['\u2229'])
-    MINUS            = (['\u2212'])
-    DIVISION         = (['\u00F7'])
+    NONE             = (0, [])
+    SELECTION        = (1, ['\u03C3', 'select'])
+    PROJECTION       = (1, ['\u03C0', 'pi'])
+    CROSS_JOIN       = (2, ['\u00D7'])
+    NATURAL_JOIN     = (2, ['\u2A1D'])
+    LEFT_OUTER_JOIN  = (2, ['\u27D5'])
+    RIGHT_OUTER_JOIN = (2, ['\u27D6'])
+    FULL_OUTER_JOIN  = (2, ['\u27D7'])
+    UNION            = (2, ['\u222A'])
+    INTERSECTION     = (2, ['\u2229'])
+    MINUS            = (2, ['\u2212'])
+    DIVISION         = (2, ['\u00F7'])
 
-    def __init__(self, strings):
+    def __init__(self, nodes, strings):
         ''''''
+        self.nodes = nodes
         self.strings = strings
 
     def __eq__(self, other):
@@ -27,11 +28,39 @@ class TableOperator(enum.Enum):
         if isinstance(other, str):
             return other in self.strings
         raise AssertionError()
-    
+
     def __bool__(self):
         ''''''
         return self != TableOperator.NONE
-    
+
     def symbol(self):
         ''''''
         return self.strings[0]
+
+    def parametric(self, count):
+        ''' Check if count is a valid number of parameters. '''
+        if self == TableOperator.NONE:
+            return count == 0
+        if self == TableOperator.SELECTION:
+            return count == 2
+        if self == TableOperator.PROJECTION:
+            return count >= 1
+        if self == TableOperator.CROSS_JOIN:
+            return count == 0
+        if self == TableOperator.NATURAL_JOIN:
+            return count == 0 or count == 2
+        if self == TableOperator.LEFT_OUTER_JOIN:
+            return count == 0 or count == 2
+        if self == TableOperator.RIGHT_OUTER_JOIN:
+            return count == 0 or count == 2
+        if self == TableOperator.FULL_OUTER_JOIN:
+            return count == 0 or count == 2
+        if self == TableOperator.UNION:
+            return count == 0
+        if self == TableOperator.INTERSECTION:
+            return count == 0
+        if self == TableOperator.MINUS:
+            return count == 0
+        if self == TableOperator.DIVISION:
+            return count == 0
+        raise AssertionError()
