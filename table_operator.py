@@ -39,6 +39,16 @@ class TableOperator(enum.Enum):
             return ''
         return self.strings[0]
 
+    def left(self):
+        ''''''
+        array = [TableOperator.LEFT_OUTER_JOIN, TableOperator.FULL_OUTER_JOIN]
+        return self in array
+
+    def right(self):
+        ''''''
+        array = [TableOperator.RIGHT_OUTER_JOIN, TableOperator.FULL_OUTER_JOIN]
+        return self in array
+
     def parametric(self, count):
         ''' Check if count is a valid number of parameters. '''
         if self == TableOperator.NONE:

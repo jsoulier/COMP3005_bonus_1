@@ -62,13 +62,12 @@ class QueryNode:
             self.table_operator = table_operator
             break
         if not self.table_operator:
-            raise QueryError('Bad Query: {}'.format(self.string))
+            raise QueryError()
         if self.table_operator.nodes != len(self.nodes):
-            raise QueryError('Bad Query: {}'.format(self.string))
+            raise QueryError()
 
-        # Check for conditions on the table operator
+        # Check for parameters
         if len(strings) > 1:
-
             # Check for relational operator
             for relational_operator in RelationalOperator:
                 if not relational_operator.within(strings[1]):
@@ -78,16 +77,20 @@ class QueryNode:
 
             # Parse parameters
             strings[1] = strings[1].replace(',', ' ')
-            if self.relational_operator:
-                strings[1] = strings[1].replace(str(self.relational_operator), ' ')
             self.parameters = strings[1].split()
+            if self.relational_operator:
+                # Ensure operator is not at the start or end
+                index = self.parameters.index(str(self.relational_operator))
+                if not index or index == len(self.parameters) - 1:
+                    raise QueryError()
+                self.parameters.pop(index)
 
         # Ensure valid number of parameters
         if not self.table_operator.parametric(len(self.parameters)):
-            raise QueryError('Bad Query: {}'.format(self.string))
+            raise QueryError()
 
     def compute(self):
-        ''' Compute the result of the query. Assumes we've already parsed the query. '''
+        ''' Compute the result of the query. '''
         # Check if node is a leaf node
         if self.table:
             return self.table
@@ -115,13 +118,13 @@ class QueryNode:
         if self.table_operator == TableOperator.FULL_OUTER_JOIN:
             return Table.full_outer_join(tables[0], tables[1], parameters[0], comparator, parameters[1])
         if self.table_operator == TableOperator.UNION:
-            raise Table.union(tables[0], tables[1])
+            return Table.union(tables[0], tables[1])
         if self.table_operator == TableOperator.INTERSECTION:
-            raise Table.intersection(tables[0], tables[1])
+            return Table.intersection(tables[0], tables[1])
         if self.table_operator == TableOperator.MINUS:
-            raise Table.minus(tables[0], tables[1])
+            return Table.minus(tables[0], tables[1])
         if self.table_operator == TableOperator.DIVISION:
-            raise Table.division(tables[0], tables[1])
+            return Table.division(tables[0], tables[1])
         raise AssertionError()
 
     @staticmethod
@@ -141,7 +144,7 @@ class QueryNode:
             # If there is a closing parenthesis before an opening one
             if count < 0:
                 break
-        raise QueryError('Unmatched Parentheses: {}'.format(string))
+        raise QueryError()
 
     @staticmethod
     def extract(string):

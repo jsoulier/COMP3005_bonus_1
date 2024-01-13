@@ -41,7 +41,7 @@ class Table:
         # Sanity
         pattern = re.compile(r'[^a-zA-Z0-9{}(),.=_\-\n\s]')
         if pattern.search(string):
-            raise TableError('Bad Characters: {}'.format(pattern.findall(string)))
+            raise TableError()
 
         # Remove empty lines
         lines = []
@@ -64,7 +64,7 @@ class Table:
         for i, column in enumerate(columns):
             column = column.strip()
             if pattern.search(column.strip()):
-                raise TableError('Bad Columns: {}'.format(lines[0]))
+                raise TableError()
             columns[i] = column
 
         self.name = columns[0]
@@ -78,14 +78,14 @@ class Table:
 
             # Ensure rows are the same length
             if len(columns) != len(self.columns):
-                raise TableError('Bad Row: {}'.format(row))
+                raise TableError()
 
     @staticmethod
     def selection(table, column, comparator, value):
         ''''''
         # Get the column to compare
         if column not in table.columns:
-            raise TableError('Bad Selection: {}'.format(column))
+            raise TableError()
         index = table.columns.index(column)
 
         result = Table('')
@@ -109,7 +109,7 @@ class Table:
         indices = []
         for column in columns:
             if column not in result.columns:
-                raise TableError('Bad Projection: {}'.format(column))
+                raise TableError()
             indices.append(result.columns.index(column))
 
         # Remove columns
@@ -130,7 +130,7 @@ class Table:
         count1 = len(table1.rows)
         count2 = len(table2.rows)
         if count1 != count2:
-            raise TableError('Bad Cross Join: Row Count {} != {}'.format(count1, count2))
+            raise TableError()
 
         result = Table('')
         result.columns = table1.columns + table2.columns
@@ -148,16 +148,16 @@ class Table:
         columns1 = []
         columns2 = []
 
-        # If parameters were specified
+        # Use provided columns
         if comparator:
             if column1 not in table1.columns:
-                raise TableError('Bad Join: {} {} {}', column1, comparator, column2)
+                raise TableError()
             if column2 not in table2.columns:
-                raise TableError('Bad Join: {} {} {}', column1, comparator, column2)
+                raise TableError()
             columns1 = [column1]
             columns2 = [column2]
 
-        # If parameters were unspecified, find matching columns
+        # Find columns
         else:
             comparator = RelationalOperator.EQUAL
             for column in table1.columns:
@@ -174,7 +174,7 @@ class Table:
         for column in columns2:
             indices2.append(table2.columns.index(column) + len(table1.columns))
 
-        # Calculate and record rows to remove
+        # Calculate and save rows to remove
         table = Table.cross_join(table1, table2)
         counts1 = len(table1.rows) * [0]
         counts2 = len(table2.rows) * [0]
@@ -189,54 +189,56 @@ class Table:
         for i in reversed(indices):
             table.rows.pop(i)
 
-        # Add back fully removed rows
-        if type == TableOperator.LEFT_OUTER_JOIN or type == TableOperator.FULL_OUTER_JOIN:
+        # Try adding back fully removed rows
+        empty1 = len(table2.columns) * [TableElement('')]
+        empty2 = len(table1.columns) * [TableElement('')]
+        if type.left():
             for count in counts1:
                 if count == len(table1.rows):
-                    table.rows.append(table1.rows[count - 1] + len(table2.columns) * [TableElement('')])
-        if type == TableOperator.RIGHT_OUTER_JOIN or type == TableOperator.FULL_OUTER_JOIN:
+                    table.rows.append(table1.rows[count - 1] + empty1)
+        if type.right():
             for count in counts2:
                 if count == len(table2.rows):
-                    table.rows.append(len(table1.columns) * [TableElement('')] + table2.rows[count - 1])
+                    table.rows.append(empty2 + table2.rows[count - 1])
 
         return table
 
     @staticmethod
-    def natural_join(table1, table2, column1, comparator, column2):
+    def natural_join(*args):
         ''''''
-        return Table.join(table1, table2, column1, comparator, column2, TableOperator.NATURAL_JOIN)
+        return Table.join(*args, TableOperator.NATURAL_JOIN)
 
     @staticmethod
-    def left_outer_join(table1, table2, column1, comparator, column2):
+    def left_outer_join(*args):
         ''''''
-        return Table.join(table1, table2, column1, comparator, column2, TableOperator.LEFT_OUTER_JOIN)
+        return Table.join(*args, TableOperator.LEFT_OUTER_JOIN)
 
     @staticmethod
-    def right_outer_join(table1, table2, column1, comparator, column2):
+    def right_outer_join(*args):
         ''''''
-        return Table.join(table1, table2, column1, comparator, column2, TableOperator.RIGHT_OUTER_JOIN)
+        return Table.join(*args, TableOperator.RIGHT_OUTER_JOIN)
 
     @staticmethod
-    def full_outer_join(table1, table2, column1, comparator, column2):
+    def full_outer_join(*args):
         ''''''
-        return Table.join(table1, table2, column1, comparator, column2, TableOperator.FULL_OUTER_JOIN)
+        return Table.join(*args, TableOperator.FULL_OUTER_JOIN)
 
     @staticmethod
     def union(table1, table2):
         ''''''
-        raise NotImplementedError
+        raise NotImplementedError()
 
     @staticmethod
     def intersection(table1, table2):
         ''''''
-        raise NotImplementedError
+        raise NotImplementedError()
 
     @staticmethod
     def minus(table1, table2):
         ''''''
-        raise NotImplementedError
+        raise NotImplementedError()
 
     @staticmethod
     def division(table1, table2):
         ''''''
-        raise NotImplementedError
+        raise NotImplementedError()

@@ -1,4 +1,4 @@
-# Relational Algebra Query Processor for COMP3005B
+# COMP3005B Bonus Question: Relational Algebra Query Processor
 
 ## Requirements
 
