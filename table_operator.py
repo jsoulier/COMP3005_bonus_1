@@ -14,7 +14,7 @@ class TableOperator(enum.Enum):
     UNION            = (2, ['\u222A'])
     INTERSECTION     = (2, ['\u2229'])
     MINUS            = (2, ['\u2212'])
-    DIVISION         = (2, ['\u00F7'])
+    DIVISION         = (2, ['\u00F7', '/'])
 
     def __init__(self, nodes, strings):
         ''''''

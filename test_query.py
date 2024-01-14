@@ -7,7 +7,7 @@ from table_operator import TableOperator
 
 class TestQuery(unittest.TestCase):
 
-    def test_parse1(self):
+    def test_compute1(self):
         string1 = '''
             Employees (ID, Name, Age, Dept) = {
                 1, John, 32, Sales
@@ -27,11 +27,12 @@ class TestQuery(unittest.TestCase):
         query.compute('pi Name Employees', [Table(string1), Table(string2)])
         query.compute('pi Name (pi Name, Age (Employees))', [Table(string1), Table(string2)])
         query.compute('select ID > 1 (Employees)', [Table(string1), Table(string2)])
+        query.compute('select ID>1 (Employees)', [Table(string1), Table(string2)])
         query.compute('(Employees) {} Name = Name (Department)'.format(TableOperator.NATURAL_JOIN), [Table(string1), Table(string2)])
         query.compute('   pi Name(   pi Name   ,Age (  Employees  )  )  ', [Table(string1), Table(string2)])
         query.compute('pi Name (pi Name, Email Employees)', [Table(string1), Table(string2)])
 
-    def test_parse2(self):
+    def test_compute2(self):
         string1 = '''
             Employees (ID, Name, Age, Dept) = {
                 1, John, 32, Sales
@@ -79,6 +80,72 @@ class TestQuery(unittest.TestCase):
             query.compute('(Employees) pi (Employees) Name', [Table(string1), Table(string2)])
         with self.assertRaises(QueryError):
             query.compute('(Employees) pi Name (Employees)', [Table(string1), Table(string2)])
+
+    def test_compute3(self):
+        string1 = '''
+            Stud_Course (sid, cname, mark) = {
+                1, Math, 3
+                1, Physics, 2
+                1, Network, 3
+                2, Math, 3
+                2, Physics, 2
+                2, Network, 3
+                3, Network, 3
+            }
+        '''
+        string2 = '''
+            Course (cname, Hours) = {
+                Math, 3
+                Physics, 2
+                Network, 3
+            }
+        '''
+        string3 = '''
+            Student (id, name, email, Dept) = {
+                1, Alex, a@c, Sales
+                2, John, j@c, Finance
+                3, Mo, m@c, HR
+            }
+        '''
+        query = Query()
+        table = query.compute('(pi sid, cname Stud_Course) / (pi cname Course)', [Table(string1), Table(string2), Table(string3)])
+        self.assertEqual(table.name, '')
+        self.assertEqual(len(table.columns), 1)
+        self.assertEqual(len(table.rows), 2)
+        self.assertEqual(table.rows[0], [1])
+        self.assertEqual(table.rows[1], [2])
+
+    def test_compute4(self):
+        string1 = '''
+            Stud_Course (id, cname, mark) = {
+                1, Math, 3
+                1, Physics, 2
+                1, Network, 3
+                2, Math, 3
+                2, Physics, 2
+                2, Network, 3
+                3, Network, 3
+            }
+        '''
+        string2 = '''
+            Course (cname, Hours) = {
+                Math, 3
+                Physics, 2
+                Network, 3
+            }
+        '''
+        string3 = '''
+            Student (id, name, email, Dept) = {
+                1, Alex, a@c, Sales
+                2, John, j@c, Finance
+                3, Mo, m@c, HR
+            }
+        '''
+        query = Query()
+        table = query.compute('((pi id, cname Stud_Course) / (pi cname Course)) {} Student'.format(TableOperator.NATURAL_JOIN), [Table(string1), Table(string2), Table(string3)])
+        self.assertEqual(table.name, '')
+        self.assertEqual(len(table.columns), 4)
+        self.assertEqual(len(table.rows), 2)
 
     def test_parenthesize(self):
         self.assertEqual(Query.parenthesize(' string ', 'string'), ' (string) ')

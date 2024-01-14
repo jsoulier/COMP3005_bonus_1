@@ -86,6 +86,8 @@ class QueryNode:
 
             # Parse parameters
             strings[1] = strings[1].replace(',', ' ')
+            if self.relational_operator:
+                strings[1] = strings[1].replace(str(self.relational_operator), ' {} '.format(self.relational_operator))
             self.parameters = strings[1].split()
             if self.relational_operator:
                 # Ensure operator is not at the start or end
@@ -109,7 +111,9 @@ class QueryNode:
         for node in self.nodes:
             tables.append(node.compute())
         comparator = self.relational_operator
-        parameters = self.parameters
+        parameters = ['', '']
+        if self.parameters:
+            parameters = self.parameters
 
         # Forward arguments to table functions
         if self.table_operator == TableOperator.SELECTION:

@@ -29,6 +29,10 @@ class TableElement:
             pass
         return string
     
+    def __bool__(self):
+        ''''''
+        return bool(self.value)
+
     def __str__(self):
         ''''''
         return str(self.value)

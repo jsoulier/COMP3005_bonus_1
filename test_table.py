@@ -65,30 +65,9 @@ class TestTable(unittest.TestCase):
 
     def test_init3(self):
         string = '''
-            Employees (Name, Wealth) = {
-                John, 32000
+            Employ_ees (@Name_, _Wealth) = {
+                Jaan_Soulier, $32000
                 Alice, -64000
-                Bob, 7200
-            }
-        '''
-        table = Table(string)
-        self.assertEqual(table.name, 'Employees')
-        self.assertEqual(len(table.columns), 2)
-        self.assertEqual(len(table.rows), 3)
-        self.assertEqual(table.columns[0], 'Name')
-        self.assertEqual(table.columns[1], 'Wealth')
-        self.assertEqual(table.rows[0][0], 'John')
-        self.assertEqual(table.rows[0][1], 32000)
-        self.assertEqual(table.rows[1][0], 'Alice')
-        self.assertEqual(table.rows[1][1], -64000)
-        self.assertEqual(table.rows[2][0], 'Bob')
-        self.assertEqual(table.rows[2][1], 7200)
-
-    def test_init4(self):
-        string = '''
-            Employ_ees (Name_, _Wealth) = {
-                Jaan_Soulier, 32000
-                Alice, 64000
                 Bob, _7200
             }
         '''
@@ -96,12 +75,12 @@ class TestTable(unittest.TestCase):
         self.assertEqual(table.name, 'Employ_ees')
         self.assertEqual(len(table.columns), 2)
         self.assertEqual(len(table.rows), 3)
-        self.assertEqual(table.columns[0], 'Name_')
+        self.assertEqual(table.columns[0], '@Name_')
         self.assertEqual(table.columns[1], '_Wealth')
         self.assertEqual(table.rows[0][0], 'Jaan_Soulier')
-        self.assertEqual(table.rows[0][1], 32000)
+        self.assertEqual(table.rows[0][1], '$32000')
         self.assertEqual(table.rows[1][0], 'Alice')
-        self.assertEqual(table.rows[1][1], 64000)
+        self.assertEqual(table.rows[1][1], -64000)
         self.assertEqual(table.rows[2][0], 'Bob')
         self.assertEqual(table.rows[2][1], '_7200')
 
@@ -130,39 +109,6 @@ class TestTable(unittest.TestCase):
 
     def test_init7(self):
         string = '''
-            Employees (ID, Name, Age) = {
-                1, John, 32;
-                2, Alice, 28
-                3, Bob, 29
-            }
-        '''
-        with self.assertRaises(TableError):
-            Table(string)
-
-    def test_init8(self):
-        string = '''
-            Employees (ID, Name, Age) = {
-                1, John, 32
-                2, Alice, $28
-                3, Bob, 29
-            }
-        '''
-        with self.assertRaises(TableError):
-            Table(string)
-
-    def test_init9(self):
-        string = '''
-            Employees (ID, &Name, Age) = {
-                1, John, 32
-                2, Alice, 28
-                3, Bob, 29
-            }
-        '''
-        with self.assertRaises(TableError):
-            Table(string)
-
-    def test_init10(self):
-        string = '''
             Employees (ID, Name Name, Age) = {
                 1, John, 32
                 2, Alice, 28
@@ -172,7 +118,7 @@ class TestTable(unittest.TestCase):
         with self.assertRaises(TableError):
             Table(string)
 
-    def test_init11(self):
+    def test_init8(self):
         string = '''
             Employees Employees (ID, Name Name, Age) = {
                 1, John, 32
@@ -183,7 +129,17 @@ class TestTable(unittest.TestCase):
         with self.assertRaises(TableError):
             Table(string)
 
-    def test_init12(self):
+    def test_init9(self):
+        string = '''
+            Employees () = {
+                1, John, 32
+                2, Alice, 28
+                3, Bob, 29  }
+        '''
+        with self.assertRaises(TableError):
+            Table(string)
+
+    def test_init10(self):
         string = '''
             Employees (ID, Name, Age) = {
             }
@@ -196,7 +152,7 @@ class TestTable(unittest.TestCase):
         self.assertEqual(table.columns[1], 'Name')
         self.assertEqual(table.columns[2], 'Age')
 
-    def test_init13(self):
+    def test_init11(self):
         string = '''
             Employees () = {
             }
@@ -205,16 +161,6 @@ class TestTable(unittest.TestCase):
         self.assertEqual(table.name, 'Employees')
         self.assertEqual(len(table.columns), 0)
         self.assertEqual(len(table.rows), 0)
-
-    def test_init14(self):
-        string = '''
-            Employees () = {
-                1, John, 32
-                2, Alice, 28
-                3, Bob, 29  }
-        '''
-        with self.assertRaises(TableError):
-            Table(string)
 
     def test_selection1(self):
         string = '''
@@ -341,23 +287,6 @@ class TestTable(unittest.TestCase):
         self.assertEqual(table.rows[7], [3, 'Bob', 29, 'HR', 'Sales', 30000])
         self.assertEqual(table.rows[8], [3, 'Bob', 29, 'HR', 'HR', 25000])
 
-    def test_cross_join2(self):
-        string1 = '''
-            Employees (ID, Name, Age, Dept) = {
-                1, John, 32, Sales
-                2, Alice, 28, Finance
-                3, Bob, 29, HR
-            }
-        '''
-        string2 = '''
-            Department (Name, Budget) = {
-                Finance, 20000
-                Sales, 30000
-            }
-        '''
-        with self.assertRaises(TableError):
-            Table.cross_join(Table(string1), Table(string2))
-
     def test_natural_join1(self):
         string1 = '''
             Employees (ID, Name, Age, Dept) = {
@@ -375,12 +304,12 @@ class TestTable(unittest.TestCase):
         '''
         table = Table.natural_join(Table(string1), Table(string2), 'Dept', RelationalOperator.EQUAL, 'Name')
         self.assertEqual(table.name, '')
-        self.assertEqual(len(table.columns), 6)
+        self.assertEqual(len(table.columns), 5)
         self.assertEqual(len(table.rows), 3)
-        self.assertEqual(table.columns, ['ID', 'Name', 'Age', 'Dept', 'Name', 'Budget'])
-        self.assertEqual(table.rows[0], [1, 'John', 32, 'Sales', 'Sales', 30000])
-        self.assertEqual(table.rows[1], [2, 'Alice', 28, 'Finance', 'Finance', 20000])
-        self.assertEqual(table.rows[2], [3, 'Bob', 29, 'HR', 'HR', 25000])
+        self.assertEqual(table.columns, ['ID', 'Name', 'Age', 'Dept', 'Budget'])
+        self.assertEqual(table.rows[0], [1, 'John', 32, 'Sales', 30000])
+        self.assertEqual(table.rows[1], [2, 'Alice', 28, 'Finance', 20000])
+        self.assertEqual(table.rows[2], [3, 'Bob', 29, 'HR', 25000])
 
     def test_natural_join2(self):
         string1 = '''
@@ -391,20 +320,20 @@ class TestTable(unittest.TestCase):
             }
         '''
         string2 = '''
-            Department (Dept, Budget) = {
-                Finance, 20000
-                Sales, 30000
-                HR, 25000
+            Department (Dept, ID) = {
+                Finance, 2
+                Sales, 1
+                HR, 3
             }
         '''
         table = Table.natural_join(Table(string1), Table(string2), '', RelationalOperator.NONE, '')
         self.assertEqual(table.name, '')
-        self.assertEqual(len(table.columns), 6)
+        self.assertEqual(len(table.columns), 4)
         self.assertEqual(len(table.rows), 3)
-        self.assertEqual(table.columns, ['ID', 'Name', 'Age', 'Dept', 'Dept', 'Budget'])
-        self.assertEqual(table.rows[0], [1, 'John', 32, 'Sales', 'Sales', 30000])
-        self.assertEqual(table.rows[1], [2, 'Alice', 28, 'Finance', 'Finance', 20000])
-        self.assertEqual(table.rows[2], [3, 'Bob', 29, 'HR', 'HR', 25000])
+        self.assertEqual(table.columns, ['ID', 'Name', 'Age', 'Dept'])
+        self.assertEqual(table.rows[0], [1, 'John', 32, 'Sales'])
+        self.assertEqual(table.rows[1], [2, 'Alice', 28, 'Finance'])
+        self.assertEqual(table.rows[2], [3, 'Bob', 29, 'HR'])
 
     def test_natural_join3(self):
         string1 = '''
@@ -423,33 +352,37 @@ class TestTable(unittest.TestCase):
         '''
         table = Table.natural_join(Table(string1), Table(string2), '', RelationalOperator.NONE, '')
         self.assertEqual(table.name, '')
+        self.assertEqual(len(table.columns), 6)
+        self.assertEqual(len(table.rows), 0)
         self.assertEqual(table.columns, ['ID', 'Name', 'Age', 'Dept', 'VP', 'Budget'])
-        self.assertEqual(table.rows[0], [1, 'John', 32, 'Sales', 'Finance', 20000])
-        self.assertEqual(table.rows[1], [1, 'John', 32, 'Sales', 'Sales', 30000])
-        self.assertEqual(table.rows[2], [1, 'John', 32, 'Sales', 'HR', 25000])
-        self.assertEqual(table.rows[3], [2, 'Alice', 28, 'Finance', 'Finance', 20000])
-        self.assertEqual(table.rows[4], [2, 'Alice', 28, 'Finance', 'Sales', 30000])
-        self.assertEqual(table.rows[5], [2, 'Alice', 28, 'Finance', 'HR', 25000])
-        self.assertEqual(table.rows[6], [3, 'Bob', 29, 'HR', 'Finance', 20000])
-        self.assertEqual(table.rows[7], [3, 'Bob', 29, 'HR', 'Sales', 30000])
-        self.assertEqual(table.rows[8], [3, 'Bob', 29, 'HR', 'HR', 25000])
 
     def test_natural_join4(self):
         string1 = '''
-            Employees (ID, Name, Age, Dept) = {
-                1, John, 32, Sales
-                2, Alice, 28, Finance
-                3, Bob, 29, HR
+            Student (ID, Name, Age) = {
+                1, John, 32
+                2, Alice, 28
+                3, Bob, 29
             }
         '''
         string2 = '''
-            Department (VP, Budget) = {
-                Finance, 20000
-                Sales, 30000
+            Takes (ID, Course) = {
+                1, Math
+                1, Physics
+                1, Network
+                2, Network
+                3, Math
             }
         '''
-        with self.assertRaises(TableError):
-            Table.natural_join(Table(string1), Table(string2), '', RelationalOperator.NONE, '')
+        table = Table.natural_join(Table(string1), Table(string2), '', RelationalOperator.NONE, '')
+        self.assertEqual(table.name, '')
+        self.assertEqual(len(table.columns), 4)
+        self.assertEqual(len(table.rows), 5)
+        self.assertEqual(table.columns, ['ID', 'Name', 'Age', 'Course'])
+        self.assertEqual(table.rows[0], [1, 'John', 32, 'Math'])
+        self.assertEqual(table.rows[1], [1, 'John', 32, 'Physics'])
+        self.assertEqual(table.rows[2], [1, 'John', 32, 'Network'])
+        self.assertEqual(table.rows[3], [2, 'Alice', 28, 'Network'])
+        self.assertEqual(table.rows[4], [3, 'Bob', 29, 'Math'])
 
     def test_left_outer_join(self):
         string1 = '''
@@ -468,12 +401,12 @@ class TestTable(unittest.TestCase):
         '''
         table = Table.left_outer_join(Table(string1), Table(string2), '', RelationalOperator.NONE, '')
         self.assertEqual(table.name, '')
-        self.assertEqual(len(table.columns), 6)
+        self.assertEqual(len(table.columns), 5)
         self.assertEqual(len(table.rows), 3)
-        self.assertEqual(table.columns, ['ID', 'Name', 'Age', 'Dept', 'Dept', 'Budget'])
-        self.assertEqual(table.rows[0], [1, 'John', 32, 'Sales', 'Sales', 30000])
-        self.assertEqual(table.rows[1], [2, 'Alice', 28, 'Finance', 'Finance', 20000])
-        self.assertEqual(table.rows[2], [3, 'Bob', 29, 'HR', '', ''])
+        self.assertEqual(table.columns, ['ID', 'Name', 'Age', 'Dept', 'Budget'])
+        self.assertEqual(table.rows[0], [1, 'John', 32, 'Sales', 30000])
+        self.assertEqual(table.rows[1], [2, 'Alice', 28, 'Finance', 20000])
+        self.assertEqual(table.rows[2], [3, 'Bob', 29, 'HR', ''])
 
     def test_right_outer_join(self):
         string1 = '''
@@ -492,14 +425,14 @@ class TestTable(unittest.TestCase):
         '''
         table = Table.right_outer_join(Table(string1), Table(string2), '', RelationalOperator.NONE, '')
         self.assertEqual(table.name, '')
-        self.assertEqual(len(table.columns), 6)
+        self.assertEqual(len(table.columns), 5)
         self.assertEqual(len(table.rows), 3)
-        self.assertEqual(table.columns, ['ID', 'Name', 'Age', 'Dept', 'Dept', 'Budget'])
-        self.assertEqual(table.rows[0], [1, 'John', 32, 'Sales', 'Sales', 30000])
-        self.assertEqual(table.rows[1], [2, 'Alice', 28, 'Finance', 'Finance', 20000])
-        self.assertEqual(table.rows[2], ['', '', '', '', 'IT', 25000])
+        self.assertEqual(table.columns, ['ID', 'Name', 'Age', 'Dept', 'Budget'])
+        self.assertEqual(table.rows[0], [1, 'John', 32, 'Sales', 30000])
+        self.assertEqual(table.rows[1], [2, 'Alice', 28, 'Finance', 20000])
+        self.assertEqual(table.rows[2], ['', '', '', 'IT', 25000])
 
-    def test_full_outer_join(self):
+    def test_full_outer_join1(self):
         string1 = '''
             Employees (ID, Name, Age, Dept) = {
                 1, John, 32, Sales
@@ -516,13 +449,73 @@ class TestTable(unittest.TestCase):
         '''
         table = Table.full_outer_join(Table(string1), Table(string2), '', RelationalOperator.NONE, '')
         self.assertEqual(table.name, '')
-        self.assertEqual(len(table.columns), 6)
+        self.assertEqual(len(table.columns), 5)
         self.assertEqual(len(table.rows), 4)
-        self.assertEqual(table.columns, ['ID', 'Name', 'Age', 'Dept', 'Dept', 'Budget'])
-        self.assertEqual(table.rows[0], [1, 'John', 32, 'Sales', 'Sales', 30000])
-        self.assertEqual(table.rows[1], [2, 'Alice', 28, 'Finance', 'Finance', 20000])
-        self.assertEqual(table.rows[2], [3, 'Bob', 29, 'HR', '', ''])
-        self.assertEqual(table.rows[3], ['', '', '', '', 'IT', 25000])
+        self.assertEqual(table.columns, ['ID', 'Name', 'Age', 'Dept', 'Budget'])
+        self.assertEqual(table.rows[0], [1, 'John', 32, 'Sales', 30000])
+        self.assertEqual(table.rows[1], [2, 'Alice', 28, 'Finance', 20000])
+        self.assertEqual(table.rows[2], [3, 'Bob', 29, 'HR', ''])
+        self.assertEqual(table.rows[3], ['', '', '', 'IT', 25000])
+
+    def test_full_outer_join2(self):
+        string1 = '''
+            Employees (ID, Name, Age, Dept) = {
+                1, John, 32, Sales
+                2, Alice, 28, Finance
+                3, Bob, 29, HR
+                4, Joe, 29, Marketing
+                5, Billy, 29, Testing
+                6, Max, 29, Research
+            }
+        '''
+        string2 = '''
+            Department (Dept, Budget) = {
+                Finance, 20000
+                Sales, 30000
+                IT, 25000
+                Support, 45000
+            }
+        '''
+        table = Table.full_outer_join(Table(string1), Table(string2), '', RelationalOperator.NONE, '')
+        self.assertEqual(table.name, '')
+        self.assertEqual(len(table.columns), 5)
+        self.assertEqual(len(table.rows), 8)
+        self.assertEqual(table.columns, ['ID', 'Name', 'Age', 'Dept', 'Budget'])
+        self.assertEqual(table.rows[0], [1, 'John', 32, 'Sales', 30000])
+        self.assertEqual(table.rows[1], [2, 'Alice', 28, 'Finance', 20000])
+        self.assertEqual(table.rows[2], [3, 'Bob', 29, 'HR', ''])
+        self.assertEqual(table.rows[3], [4, 'Joe', 29, 'Marketing', ''])
+        self.assertEqual(table.rows[4], [5, 'Billy', 29, 'Testing', ''])
+        self.assertEqual(table.rows[5], [6, 'Max', 29, 'Research', ''])
+        self.assertEqual(table.rows[6], ['', '', '', 'IT', 25000])
+        self.assertEqual(table.rows[7], ['', '', '', 'Support', 45000])
+
+    def test_full_outer_join3(self):
+        string1 = '''
+            Employees (ID, Name, Age, Dept) = {
+                3, Bob, 29, HR
+                4, Joe, 29, Marketing
+                5, Billy, 29, Testing
+                6, Max, 29, Research
+            }
+        '''
+        string2 = '''
+            Department (Dept, Budget) = {
+                IT, 25000
+                Support, 45000
+            }
+        '''
+        table = Table.full_outer_join(Table(string1), Table(string2), '', RelationalOperator.NONE, '')
+        self.assertEqual(table.name, '')
+        self.assertEqual(len(table.columns), 5)
+        self.assertEqual(len(table.rows), 6)
+        self.assertEqual(table.columns, ['ID', 'Name', 'Age', 'Dept', 'Budget'])
+        self.assertEqual(table.rows[0], [3, 'Bob', 29, 'HR', ''])
+        self.assertEqual(table.rows[1], [4, 'Joe', 29, 'Marketing', ''])
+        self.assertEqual(table.rows[2], [5, 'Billy', 29, 'Testing', ''])
+        self.assertEqual(table.rows[3], [6, 'Max', 29, 'Research', ''])
+        self.assertEqual(table.rows[4], ['', '', '', 'IT', 25000])
+        self.assertEqual(table.rows[5], ['', '', '', 'Support', 45000])
 
     def test_union1(self):
         string1 = '''
@@ -745,9 +738,6 @@ class TestTable(unittest.TestCase):
         self.assertEqual(len(table.rows), 0)
         self.assertEqual(table.columns, ['ID', 'Name', 'Age'])
 
-
-    # TODO:
-
     def test_division1(self):
         string1 = '''
             Employees1 (ID, Name, Age, Dept) = {
@@ -763,6 +753,34 @@ class TestTable(unittest.TestCase):
             }
         '''
         string2 = '''
+            Employees2 (Dept) = {
+                Finance
+                Sales
+                HR
+            }
+        '''
+        table = Table.division(Table(string1), Table(string2))
+        self.assertEqual(table.name, '')
+        self.assertEqual(len(table.columns), 3)
+        self.assertEqual(len(table.rows), 3)
+        self.assertEqual(table.columns, ['ID', 'Name', 'Age'])
+        self.assertEqual(table.rows[0], [1, 'John', 32])
+        self.assertEqual(table.rows[1], [2, 'Alice', 28])
+        self.assertEqual(table.rows[2], [3, 'Bob', 29])
+
+    def test_division2(self):
+        string1 = '''
+            Employees1 (ID, Name, Age, Dept) = {
+                1, John, 32, Finance
+                1, John, 32, Sales
+                1, John, 32, HR
+                2, Alice, 28, Finance
+                2, Alice, 28, Sales
+                2, Alice, 28, HR
+                3, Bob, 29, Finance
+            }
+        '''
+        string2 = '''
             Employees1 (Dept) = {
                 Finance
                 Sales
@@ -770,8 +788,13 @@ class TestTable(unittest.TestCase):
             }
         '''
         table = Table.division(Table(string1), Table(string2))
+        self.assertEqual(len(table.columns), 3)
+        self.assertEqual(len(table.rows), 2)
+        self.assertEqual(table.columns, ['ID', 'Name', 'Age'])
+        self.assertEqual(table.rows[0], [1, 'John', 32])
+        self.assertEqual(table.rows[1], [2, 'Alice', 28])
 
-    def test_division2(self):
+    def test_division3(self):
         string1 = '''
             Employees1 (ID, Name, Age, Dept, City) = {
                 1, John, 32, Finance, Ottawa
@@ -790,6 +813,78 @@ class TestTable(unittest.TestCase):
                 Finance, Ottawa
                 Sales, Toronto
                 HR, Vancouver
+            }
+        '''
+        with self.assertRaises(TableError):
+            Table.division(Table(string1), Table(string2))
+
+    def test_division4(self):
+        string1 = '''
+            Employees1 (ID, Name, Age, Dept) = {
+                1, John, 32, Finance
+                1, John, 32, Sales
+                1, John, 32, HR
+                2, Alice, 28, Finance
+                2, Alice, 28, Sales
+                2, Alice, 28, HR
+                3, Bob, 29, Finance
+                3, Bob, 29, Sales
+                3, Bob, 29, HR
+            }
+        '''
+        string2 = '''
+            Employees2 (Dept) = {
+                Finance
+                Sales
+                IT
+            }
+        '''
+        with self.assertRaises(TableError):
+            Table.division(Table(string1), Table(string2))
+
+    def test_division5(self):
+        string1 = '''
+            Employees1 (ID, Name, Age, Dept) = {
+                1, John, 32, Finance
+                2, Alice, 28, Sales
+                3, Bob, 29, HR
+                1, John, 32, Finance
+                2, Alice, 28, Sales
+                3, Bob, 29, HR
+                1, John, 32, Finance
+                2, Alice, 28, Sales
+                3, Bob, 29, HR
+            }
+        '''
+        string2 = '''
+            Employees2 (Dept) = {
+                Finance
+                Sales
+                HR
+            }
+        '''
+        with self.assertRaises(TableError):
+            Table.division(Table(string1), Table(string2))
+
+    def test_division6(self):
+        string1 = '''
+            Employees1 (ID, Name, Age, Dept) = {
+                1, John, 32, Finance
+                1, John, 32, Finance
+                1, John, 32, Finance
+                2, Alice, 28, Sales
+                2, Alice, 28, Sales
+                2, Alice, 28, Sales
+                3, Bob, 29, HR
+                3, Bob, 29, HR
+                3, Bob, 29, HR
+            }
+        '''
+        string2 = '''
+            Employees2 (Dept) = {
+                Finance
+                Sales
+                HR
             }
         '''
         with self.assertRaises(TableError):

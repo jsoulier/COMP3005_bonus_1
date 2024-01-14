@@ -1,5 +1,4 @@
 import copy
-import re
 
 from relational_operator import RelationalOperator
 from table_element import TableElement
@@ -38,11 +37,6 @@ class Table:
         if not string:
             return
 
-        # Sanity
-        pattern = re.compile(r'[^a-zA-Z0-9{}(),.=_\-\n\s]')
-        if pattern.search(string):
-            raise TableError()
-
         # Remove empty lines
         lines = []
         for line in string.splitlines():
@@ -59,14 +53,6 @@ class Table:
         columns = columns.replace('=', ' ')
         columns = columns.replace(',', ' ')
         columns = columns.split()
-
-        # Ensure column doesn't contain bad characters
-        pattern = re.compile(r'[^a-zA-Z0-9_]')
-        for i, column in enumerate(columns):
-            column = column.strip()
-            if pattern.search(column.strip()):
-                raise TableError()
-            columns[i] = column
 
         self.name = columns[0]
         self.columns = columns[1:]
@@ -124,11 +110,6 @@ class Table:
     @staticmethod
     def cross_join(table1, table2):
         ''''''
-        count1 = len(table1.rows)
-        count2 = len(table2.rows)
-        if count1 != count2:
-            raise TableError()
-
         result = Table('')
         result.columns = table1.columns + table2.columns
 
@@ -169,34 +150,85 @@ class Table:
         for column in columns1:
             indices1.append(table1.columns.index(column))
         for column in columns2:
-            indices2.append(table2.columns.index(column) + len(table1.columns))
+            indices2.append(table2.columns.index(column))
 
-        # Calculate and save rows to remove
-        result = Table.cross_join(table1, table2)
-        counts1 = len(table1.rows) * [0]
-        counts2 = len(table2.rows) * [0]
-        indices = []
-        for column1, column2 in zip(indices1, indices2):
-            for i, row in enumerate(result.rows):
-                if comparator(row[column1], row[column2]):
-                    continue
-                counts1[i // len(table1.rows)] += 1
-                counts2[i % len(table1.rows)] += 1
-                indices.append(i)
-        for i in reversed(indices):
-            result.rows.pop(i)
+        result = Table('')
+        result.columns = table1.columns + table2.columns
 
-        # Try adding back fully removed rows
-        empty1 = len(table2.columns) * [TableElement('')]
-        empty2 = len(table1.columns) * [TableElement('')]
-        if type.left():
-            for count in counts1:
-                if count == len(table1.rows):
-                    result.rows.append(table1.rows[count - 1] + empty1)
-        if type.right():
-            for count in counts2:
-                if count == len(table2.rows):
-                    result.rows.append(empty2 + table2.rows[count - 1])
+        # If any columns matched
+        if columns1 and columns2:
+            rows1 = copy.deepcopy(table1.rows)
+            rows2 = copy.deepcopy(table2.rows)
+
+            # For filling empty space on specific joins
+            empty1 = len(table2.columns) * [TableElement('')]
+            empty2 = len(table1.columns) * [TableElement('')]
+
+            # Find matches for first table
+            for row1 in rows1:
+                matches = []
+
+                # Compare columns and match rows
+                columns1 = [row1[i] for i in indices1]
+                for row2 in rows2:
+                    columns2 = [row2[i] for i in indices2]
+                    if columns1 != columns2:
+                        continue
+                    result.rows.append(row1 + row2)
+                    matches.append(row2)
+
+                # Delete matches
+                for match in matches:
+                    rows2.remove(match)
+
+                # Fill unmatched rows
+                if not matches and type.left():
+                    result.rows.append(row1 + empty1)
+
+            # Find matches for second table
+            for row2 in rows2:
+                matches = []
+
+                # Compare columns and match rows
+                columns2 = [row2[i] for i in indices2]
+                for row1 in rows1:
+                    columns1 = [row1[i] for i in indices1]
+                    if columns2 != columns1:
+                        continue
+                    result.rows.append(row2 + row1)
+                    matches.append(row1)
+
+                # Delete matches
+                for match in matches:
+                    rows1.remove(match)
+
+                # Fill unmatched rows
+                if not matches and type.right():
+                    result.rows.append(empty2 + row2)
+
+        # Prepare for deleting duplicated columns
+        for row in result.rows:
+            for index1, index2 in zip(indices1, indices2):
+                index2 += len(table1.columns)
+
+                # Copy over valid columns
+                if not row[index1]:
+                    row[index1] = row[index2]
+                if not row[index2]:
+                    row[index2] = row[index1]
+
+        # Sort to-be-deleted columns back to front
+        columns = []
+        for index in indices2:
+            columns.append(index + len(table1.columns))
+        columns.sort()
+        columns.reverse()
+
+        # Delete duplicated columns
+        for column in columns:
+            result.columns.pop(column)
+            for row in result.rows:
+                row.pop(column)
 
         return result
 
@@ -279,7 +311,56 @@ class Table:
     @staticmethod
     def division(table1, table2):
         ''''''
+        x1 = len(table1.columns)
+        y1 = len(table1.rows)
+        x2 = len(table2.columns)
+        y2 = len(table2.rows)
+
         # Ensure columns match
-        for column in table1.columns[-len(table2.columns):]:
+        for column in table1.columns[-x2:]:
             if column not in table2.columns:
                 raise TableError()
+
+        # Ensure tables are formatted correctly
+        for i in range(y1):
+            rowA = []
+            rowB = []
+
+            for j in range(y2):
+
+                # Compute the row indices
+                index1 = i * y2 + j
+                index2 = i + y2 * j
+
+                # When first table rows are not multiple of second table
+                if index1 >= y1 // y2 * y2:
+                    continue
+                if index2 >= y1 // y2 * y2:
+                    continue
+
+                # Find the correct rows
+                row1 = table1.rows[index1][:x1 - x2]
+                row2 = table1.rows[index2][x1 - x2:]
+
+                # First iteration
+                if not rowA and not rowB:
+                    rowA = row1
+                    rowB = row2
+
+                # Ensure first table rows are correct
+                if rowA != row1 or rowB != row2:
+                    raise TableError()
+
+                # Ensure second table rows correspond to first table
+                if row2 != table2.rows[i]:
+                    raise TableError()
+
+        result = Table('')
+        result.columns = table1.columns[:x1 - x2]
+
+        # Compute the division
+        for i in range(y1 // y2):
+            row = table1.rows[i * y2][:x1 - x2]
+            result.rows.append(row)
+
+        return result
