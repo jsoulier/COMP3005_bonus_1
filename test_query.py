@@ -23,15 +23,22 @@ class TestQuery(unittest.TestCase):
             }
         '''
         tables = [Table(string1), Table(string2)]
-        query = Query()
-        query.compute('pi Name (Employees)', tables)
-        query.compute('pi Name Employees', tables)
-        query.compute('pi Name (pi Name, Age (Employees))', tables)
-        query.compute('select ID > 1 (Employees)', tables)
-        query.compute('select ID>1 (Employees)', tables)
-        query.compute('(Employees) {} Name = Name (Department)'.format(TableOperator.NATURAL_JOIN), tables)
-        query.compute('   pi Name(   pi Name   ,Age (  Employees  )  )  ', tables)
-        query.compute('pi Name (pi Name, Email Employees)', tables)
+        query1 = Query('pi Name (Employees)', tables)
+        query2 = Query('pi Name Employees', tables)
+        query3 = Query('pi Name (pi Name, Age (Employees))', tables)
+        query4 = Query('select ID > 1 (Employees)', tables)
+        query5 = Query('select ID>1 (Employees)', tables)
+        query6 = Query('(Employees) {} Name = Name (Department)'.format(TableOperator.NATURAL_JOIN), tables)
+        query7 = Query('   pi Name(   pi Name   ,Age (  Employees  )  )  ', tables)
+        query8 = Query('pi Name (pi Name, Email Employees)', tables)
+        query1.compute()
+        query2.compute()
+        query3.compute()
+        query4.compute()
+        query5.compute()
+        query6.compute()
+        query7.compute()
+        query8.compute()
 
     def test_compute2(self):
         string1 = '''
@@ -49,53 +56,75 @@ class TestQuery(unittest.TestCase):
             }
         '''
         tables = [Table(string1), Table(string2)]
-        query = Query()
+        query00 = Query('select ID > 1 1 (Employees)', tables)
+        query01 = Query('(Employees) select ID > 1', tables)
+        query02 = Query('select ID > = 1 (Employees)', tables)
+        query03 = Query('pi Name (Employees)(Employees)', tables)
+        query04 = Query('(Employees) {} (Employees)(Employees)'.format(TableOperator.CROSS_JOIN), tables)
+        query05 = Query('(Employees)(Employees) {}'.format(TableOperator.CROSS_JOIN), tables)
+        query06 = Query('{} (Employees)(Employees)'.format(TableOperator.CROSS_JOIN), tables)
+        query07 = Query('{} (Employees) {} (Employees)'.format(TableOperator.CROSS_JOIN, TableOperator.CROSS_JOIN), tables)
+        query08 = Query('(Employees) {} (Employees) {}'.format(TableOperator.CROSS_JOIN, TableOperator.CROSS_JOIN), tables)
+        query09 = Query('pi Name (pi Name, Email (Employees)(Employees))', tables)
+        query10 = Query('pi Name (pi Name, Email (string))', tables)
+        query11 = Query('(Employees) {} Name = Name Name (Department)'.format(TableOperator.NATURAL_JOIN), tables)
+        query12 = Query('(Employees) {} = Name Name (Department)'.format(TableOperator.NATURAL_JOIN), tables)
+        query13 = Query('(Employees) {} = Name (Department)'.format(TableOperator.NATURAL_JOIN), tables)
+        query14 = Query('(Employees) {} Name = (Department)'.format(TableOperator.NATURAL_JOIN), tables)
+        query15 = Query('(Employees) {} Name Name = (Department)'.format(TableOperator.NATURAL_JOIN), tables)
+        query16 = Query('(Employees) {} Name Name = Name (Department)'.format(TableOperator.NATURAL_JOIN), tables)
+        query17 = Query('(Employees) Name {} = Name (Department)'.format(TableOperator.NATURAL_JOIN), tables)
+        query18 = Query('pi (Employees) Name', tables)
+        query19 = Query('(Employees) pi Name', tables)
+        query20 = Query('(Employees)(Employees) pi Name', tables)
+        query21 = Query('(Employees) pi (Employees) Name', tables)
+        query22 = Query('(Employees) pi Name (Employees)', tables)
         with self.assertRaises(QueryError):
-            query.compute('select ID > 1 1 (Employees)', tables)
+            query00.compute()
         with self.assertRaises(QueryError):
-            query.compute('(Employees) select ID > 1', tables)
+            query01.compute()
         with self.assertRaises(QueryError):
-            query.compute('select ID > = 1 (Employees)', tables)
+            query02.compute()
         with self.assertRaises(QueryError):
-            query.compute('pi Name (Employees)(Employees)', tables)
+            query03.compute()
         with self.assertRaises(QueryError):
-            query.compute('(Employees) {} (Employees)(Employees)'.format(TableOperator.CROSS_JOIN), tables)
+            query04.compute()
         with self.assertRaises(QueryError):
-            query.compute('(Employees)(Employees) {}'.format(TableOperator.CROSS_JOIN), tables)
+            query05.compute()
         with self.assertRaises(QueryError):
-            query.compute('{} (Employees)(Employees)'.format(TableOperator.CROSS_JOIN), tables)
+            query06.compute()
         with self.assertRaises(QueryError):
-            query.compute('{} (Employees) {} (Employees)'.format(TableOperator.CROSS_JOIN, TableOperator.CROSS_JOIN), tables)
+            query07.compute()
         with self.assertRaises(QueryError):
-            query.compute('(Employees) {} (Employees) {}'.format(TableOperator.CROSS_JOIN, TableOperator.CROSS_JOIN), tables)
+            query08.compute()
         with self.assertRaises(QueryError):
-            query.compute('pi Name (pi Name, Email (Employees)(Employees))', tables)
+            query09.compute()
         with self.assertRaises(QueryError):
-            query.compute('pi Name (pi Name, Email (string))', tables)
+            query10.compute()
         with self.assertRaises(QueryError):
-            query.compute('(Employees) {} Name = Name Name (Department)'.format(TableOperator.NATURAL_JOIN), tables)
+            query11.compute()
         with self.assertRaises(QueryError):
-            query.compute('(Employees) {} = Name Name (Department)'.format(TableOperator.NATURAL_JOIN), tables)
+            query12.compute()
         with self.assertRaises(QueryError):
-            query.compute('(Employees) {} = Name (Department)'.format(TableOperator.NATURAL_JOIN), tables)
+            query13.compute()
         with self.assertRaises(QueryError):
-            query.compute('(Employees) {} Name = (Department)'.format(TableOperator.NATURAL_JOIN), tables)
+            query14.compute()
         with self.assertRaises(QueryError):
-            query.compute('(Employees) {} Name Name = (Department)'.format(TableOperator.NATURAL_JOIN), tables)
+            query15.compute()
         with self.assertRaises(QueryError):
-            query.compute('(Employees) {} Name Name = Name (Department)'.format(TableOperator.NATURAL_JOIN), tables)
+            query16.compute()
         with self.assertRaises(QueryError):
-            query.compute('(Employees) Name {} = Name (Department)'.format(TableOperator.NATURAL_JOIN), tables)
+            query17.compute()
         with self.assertRaises(QueryError):
-            query.compute('pi (Employees) Name', tables)
+            query18.compute()
         with self.assertRaises(QueryError):
-            query.compute('(Employees) pi Name', tables)
+            query19.compute()
         with self.assertRaises(QueryError):
-            query.compute('(Employees)(Employees) pi Name', tables)
+            query20.compute()
         with self.assertRaises(QueryError):
-            query.compute('(Employees) pi (Employees) Name', tables)
+            query21.compute()
         with self.assertRaises(QueryError):
-            query.compute('(Employees) pi Name (Employees)', tables)
+            query22.compute()
 
     def test_compute3(self):
         string1 = '''
@@ -117,8 +146,8 @@ class TestQuery(unittest.TestCase):
             }
         '''
         tables = [Table(string1), Table(string2)]
-        query = Query()
-        table = query.compute('(pi sid, cname Stud_Course) / (pi cname Course)', tables)
+        query = Query('(pi sid, cname Stud_Course) / (pi cname Course)', tables)
+        table = query.compute()
         self.assertEqual(table.name, '')
         self.assertEqual(len(table.columns), 1)
         self.assertEqual(len(table.rows), 2)
@@ -152,8 +181,8 @@ class TestQuery(unittest.TestCase):
             }
         '''
         tables = [Table(string1), Table(string2), Table(string3)]
-        query = Query()
-        table = query.compute('((pi id, cname Stud_Course) / (pi cname (Course))) {} Student'.format(TableOperator.NATURAL_JOIN), tables)
+        query = Query('((pi id, cname Stud_Course) / (pi cname (Course))) {} Student'.format(TableOperator.NATURAL_JOIN), tables)
+        table = query.compute()
         self.assertEqual(table.name, '')
         self.assertEqual(len(table.columns), 4)
         self.assertEqual(len(table.rows), 2)

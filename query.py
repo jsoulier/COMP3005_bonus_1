@@ -1,17 +1,25 @@
+import copy
+
 from query_node import QueryNode
 
 class Query:
     ''' A wrapper for a root QueryNode. '''
 
-    def compute(self, string, tables):
+    def __init__(self, string, tables):
+        ''''''
+        self.string = string.strip()
+        self.tables = copy.deepcopy(tables)
+
+    def compute(self):
         ''''''
         # Add parentheses to table names
-        for table in tables:
+        string = self.string
+        for table in self.tables:
             string = self.parenthesize(string, table.name)
 
-        # Parse and compute the query
+        # Start the root parse and compute
         root = QueryNode(string)
-        root.parse(tables)
+        root.parse(self.tables)
         return root.compute()
 
     @staticmethod
@@ -69,8 +77,6 @@ class Query:
             index = string1.find(string2, start)
             if index == -1:
                 break
-
-            # Move forward the cursor
             start = index + len(string2)
 
             # Check if the string is compound
@@ -78,8 +84,6 @@ class Query:
                 continue
             if start < len(string1) and string1[start] not in valid:
                 continue
-
-            # Occurrence is valid
             indices.append(index)
 
         return indices
