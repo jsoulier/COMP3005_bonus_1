@@ -557,7 +557,7 @@ class TestQueryNode(unittest.TestCase):
         with self.assertRaises(QueryError):
             self.assertEqual(QueryNode.pair('(  ( string  )  ( (  ) ( ) ) '), 0)
 
-    def test_parse_node(self):
+    def test_extract(self):
         string1 = '( string )'
         string2 = '( string string )'
         string3 = '( string ( string) )'

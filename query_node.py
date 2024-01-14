@@ -52,18 +52,11 @@ class QueryNode:
             string = string[:node.start] + string[node.end:]
             self.nodes.append(node)
 
+        # Get table operator, relational operator, and parameters
         self.table_operator = self.type(string)
-
         string = self.splice(self.string)
-        strings = string.split(maxsplit=1)
-
-
-        if len(strings) > 1:
-            self.parametrize(strings[1])
-
-        # Ensure valid number of parameters
-        if not self.table_operator.parametrize(len(self.parameters)):
-            raise QueryError()
+        string = string[len(self.table_operator):]
+        self.parametrize(string)
 
     def compute(self):
         ''' Compute the result of the query. '''
@@ -107,7 +100,7 @@ class QueryNode:
         raise AssertionError()
 
     def splice(self, string):
-        ''' Splice out child nodes and verify formatting. '''
+        ''' Splice out child nodes. '''
         # Ensure table operator correct operands
         if self.table_operator.operands != len(self.nodes):
             raise QueryError()
@@ -139,12 +132,17 @@ class QueryNode:
             # Splice out nodes
             string = string[self.nodes[0].end:self.nodes[0].end + self.nodes[1].start]
 
+        string = string.strip()
         return string
 
     def parametrize(self, string):
-        ''' Parse parameters from a string. '''
+        ''' Parse parameters and relational operator. '''
         string = string.strip()
+
+        # Ensure table operator supports no parameters
         if not string:
+            if not self.table_operator.parametrize(0):
+                raise QueryError()
             return
 
         # Check for relational operator
@@ -154,45 +152,62 @@ class QueryNode:
             self.relational_operator = relational_operator
             break
 
-        # Parse parameters
+        # Split parameters
         string = string.replace(',', ' ')
         if self.relational_operator:
             string = string.replace(str(self.relational_operator), ' {} '.format(self.relational_operator))
         self.parameters = string.split()
+
+        # Remove relational operator from parameters
         if self.relational_operator:
-            # Ensure operator is not at the start or end
+            if len(self.parameters) != 3:
+                raise QueryError()
+
+            # Ensure operator is at the center
             index = self.parameters.index(str(self.relational_operator))
             if index != 1:
                 raise QueryError()
+
+            # Remove operator from parameters
             self.parameters.pop(index)
+
+        # Ensure valid number of parameters
+        if not self.table_operator.parametrize(len(self.parameters)):
+            raise QueryError()
 
     @staticmethod
     def pair(string):
         ''' Find the index of the closing parenthesis matching the first one. '''
         count = 0
         for i, char in enumerate(string):
+
             # Keep track of the parenthesis stack
             if char == '(':
                 count += 1
                 continue
             if char != ')':
                 continue
+
+            # Found a closing parenthesis
             count -= 1
             if not count:
                 return i
-            # If there is a closing parenthesis before an opening one
             if count < 0:
                 break
+
         raise QueryError()
 
     @staticmethod
     def extract(string):
-        ''' Extract node from a string. '''
+        ''' Extract node from parentheses. '''
         node = QueryNode('')
+
+        # Find the parentheses
         node.start = string.find('(')
         if node.start == -1:
             return None
         node.end = QueryNode.pair(string) + 1
+
         # Create a substring and strip off the parentheses
         node.string = string[node.start + 1:node.end - 1]
         node.string = node.string.strip()
