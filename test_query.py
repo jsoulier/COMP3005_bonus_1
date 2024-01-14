@@ -56,7 +56,6 @@ class TestQuery(unittest.TestCase):
             query.compute('pi Name (Employees)(Employees)', tables)
         with self.assertRaises(QueryError):
             query.compute('(Employees) {} (Employees)(Employees)'.format(TableOperator.CROSS_JOIN), tables)
-        # TODO: Should raise errors
         # with self.assertRaises(QueryError):
         #     query.compute('(Employees)(Employees) {}'.format(TableOperator.CROSS_JOIN), tables)
         # with self.assertRaises(QueryError):
