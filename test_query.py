@@ -22,15 +22,16 @@ class TestQuery(unittest.TestCase):
                 HR, 25000
             }
         '''
+        tables = [Table(string1), Table(string2)]
         query = Query()
-        query.compute('pi Name (Employees)', [Table(string1), Table(string2)])
-        query.compute('pi Name Employees', [Table(string1), Table(string2)])
-        query.compute('pi Name (pi Name, Age (Employees))', [Table(string1), Table(string2)])
-        query.compute('select ID > 1 (Employees)', [Table(string1), Table(string2)])
-        query.compute('select ID>1 (Employees)', [Table(string1), Table(string2)])
-        query.compute('(Employees) {} Name = Name (Department)'.format(TableOperator.NATURAL_JOIN), [Table(string1), Table(string2)])
-        query.compute('   pi Name(   pi Name   ,Age (  Employees  )  )  ', [Table(string1), Table(string2)])
-        query.compute('pi Name (pi Name, Email Employees)', [Table(string1), Table(string2)])
+        query.compute('pi Name (Employees)', tables)
+        query.compute('pi Name Employees', tables)
+        query.compute('pi Name (pi Name, Age (Employees))', tables)
+        query.compute('select ID > 1 (Employees)', tables)
+        query.compute('select ID>1 (Employees)', tables)
+        query.compute('(Employees) {} Name = Name (Department)'.format(TableOperator.NATURAL_JOIN), tables)
+        query.compute('   pi Name(   pi Name   ,Age (  Employees  )  )  ', tables)
+        query.compute('pi Name (pi Name, Email Employees)', tables)
 
     def test_compute2(self):
         string1 = '''
@@ -47,39 +48,47 @@ class TestQuery(unittest.TestCase):
                 HR, 25000
             }
         '''
+        tables = [Table(string1), Table(string2)]
         query = Query()
         with self.assertRaises(QueryError):
-            query.compute('select ID > 1 1 (Employees)', [Table(string1), Table(string2)])
+            query.compute('select ID > 1 1 (Employees)', tables)
         with self.assertRaises(QueryError):
-            query.compute('pi Name (Employees)(Employees)', [Table(string1), Table(string2)])
+            query.compute('pi Name (Employees)(Employees)', tables)
         with self.assertRaises(QueryError):
-            query.compute('pi Name (pi Name, Email (Employees)(Employees))', [Table(string1), Table(string2)])
+            query.compute('(Employees) {} (Employees)(Employees)'.format(TableOperator.CROSS_JOIN), tables)
+        # TODO: Should raise errors
+        # with self.assertRaises(QueryError):
+        #     query.compute('(Employees)(Employees) {}'.format(TableOperator.CROSS_JOIN), tables)
+        # with self.assertRaises(QueryError):
+        #     query.compute('{} (Employees)(Employees)'.format(TableOperator.CROSS_JOIN), tables)
         with self.assertRaises(QueryError):
-            query.compute('pi Name (pi Name, Email (string))', [Table(string1), Table(string2)])
+            query.compute('pi Name (pi Name, Email (Employees)(Employees))', tables)
         with self.assertRaises(QueryError):
-            query.compute('(Employees) {} Name = Name Name (Department)'.format(TableOperator.NATURAL_JOIN), [Table(string1), Table(string2)])
+            query.compute('pi Name (pi Name, Email (string))', tables)
         with self.assertRaises(QueryError):
-            query.compute('(Employees) {} = Name Name (Department)'.format(TableOperator.NATURAL_JOIN), [Table(string1), Table(string2)])
+            query.compute('(Employees) {} Name = Name Name (Department)'.format(TableOperator.NATURAL_JOIN), tables)
         with self.assertRaises(QueryError):
-            query.compute('(Employees) {} = Name (Department)'.format(TableOperator.NATURAL_JOIN), [Table(string1), Table(string2)])
+            query.compute('(Employees) {} = Name Name (Department)'.format(TableOperator.NATURAL_JOIN), tables)
         with self.assertRaises(QueryError):
-            query.compute('(Employees) {} Name = (Department)'.format(TableOperator.NATURAL_JOIN), [Table(string1), Table(string2)])
+            query.compute('(Employees) {} = Name (Department)'.format(TableOperator.NATURAL_JOIN), tables)
         with self.assertRaises(QueryError):
-            query.compute('(Employees) {} Name Name = (Department)'.format(TableOperator.NATURAL_JOIN), [Table(string1), Table(string2)])
+            query.compute('(Employees) {} Name = (Department)'.format(TableOperator.NATURAL_JOIN), tables)
         with self.assertRaises(QueryError):
-            query.compute('(Employees) {} Name Name = Name (Department)'.format(TableOperator.NATURAL_JOIN), [Table(string1), Table(string2)])
+            query.compute('(Employees) {} Name Name = (Department)'.format(TableOperator.NATURAL_JOIN), tables)
         with self.assertRaises(QueryError):
-            query.compute('(Employees) Name {} = Name (Department)'.format(TableOperator.NATURAL_JOIN), [Table(string1), Table(string2)])
+            query.compute('(Employees) {} Name Name = Name (Department)'.format(TableOperator.NATURAL_JOIN), tables)
         with self.assertRaises(QueryError):
-            query.compute('pi (Employees) Name', [Table(string1), Table(string2)])
+            query.compute('(Employees) Name {} = Name (Department)'.format(TableOperator.NATURAL_JOIN), tables)
         with self.assertRaises(QueryError):
-            query.compute('(Employees) pi Name', [Table(string1), Table(string2)])
+            query.compute('pi (Employees) Name', tables)
         with self.assertRaises(QueryError):
-            query.compute('(Employees)(Employees) pi Name', [Table(string1), Table(string2)])
+            query.compute('(Employees) pi Name', tables)
         with self.assertRaises(QueryError):
-            query.compute('(Employees) pi (Employees) Name', [Table(string1), Table(string2)])
+            query.compute('(Employees)(Employees) pi Name', tables)
         with self.assertRaises(QueryError):
-            query.compute('(Employees) pi Name (Employees)', [Table(string1), Table(string2)])
+            query.compute('(Employees) pi (Employees) Name', tables)
+        with self.assertRaises(QueryError):
+            query.compute('(Employees) pi Name (Employees)', tables)
 
     def test_compute3(self):
         string1 = '''
@@ -100,15 +109,9 @@ class TestQuery(unittest.TestCase):
                 Network, 3
             }
         '''
-        string3 = '''
-            Student (id, name, email, Dept) = {
-                1, Alex, a@c, Sales
-                2, John, j@c, Finance
-                3, Mo, m@c, HR
-            }
-        '''
+        tables = [Table(string1), Table(string2)]
         query = Query()
-        table = query.compute('(pi sid, cname Stud_Course) / (pi cname Course)', [Table(string1), Table(string2), Table(string3)])
+        table = query.compute('(pi sid, cname Stud_Course) / (pi cname Course)', tables)
         self.assertEqual(table.name, '')
         self.assertEqual(len(table.columns), 1)
         self.assertEqual(len(table.rows), 2)
@@ -141,11 +144,14 @@ class TestQuery(unittest.TestCase):
                 3, Mo, m@c, HR
             }
         '''
+        tables = [Table(string1), Table(string2), Table(string3)]
         query = Query()
-        table = query.compute('((pi id, cname Stud_Course) / (pi cname Course)) {} Student'.format(TableOperator.NATURAL_JOIN), [Table(string1), Table(string2), Table(string3)])
+        table = query.compute('((pi id, cname Stud_Course) / (pi cname (Course))) {} Student'.format(TableOperator.NATURAL_JOIN), tables)
         self.assertEqual(table.name, '')
         self.assertEqual(len(table.columns), 4)
         self.assertEqual(len(table.rows), 2)
+        self.assertEqual(table.rows[0], [1, 'Alex', 'a@c', 'Sales'])
+        self.assertEqual(table.rows[1], [2, 'John', 'j@c', 'Finance'])
 
     def test_parenthesize(self):
         self.assertEqual(Query.parenthesize(' string ', 'string'), ' (string) ')

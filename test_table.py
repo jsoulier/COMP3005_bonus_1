@@ -287,6 +287,37 @@ class TestTable(unittest.TestCase):
         self.assertEqual(table.rows[7], [3, 'Bob', 29, 'HR', 'Sales', 30000])
         self.assertEqual(table.rows[8], [3, 'Bob', 29, 'HR', 'HR', 25000])
 
+    def test_cross_join2(self):
+        string1 = '''
+            Employees (ID, Name, Age, Dept) = {
+                1, John, 32, Sales
+                2, Alice, 28, Finance
+                3, Bob, 29, HR
+            }
+        '''
+        string2 = '''
+            Department (Name, Budget) = {
+            }
+        '''
+        table = Table.cross_join(Table(string1), Table(string2))
+        self.assertEqual(table.name, '')
+        self.assertEqual(len(table.columns), 6)
+        self.assertEqual(len(table.rows), 0)
+
+    def test_cross_join3(self):
+        string1 = '''
+            Employees () = {
+            }
+        '''
+        string2 = '''
+            Department (Name, Budget) = {
+            }
+        '''
+        table = Table.cross_join(Table(string1), Table(string2))
+        self.assertEqual(table.name, '')
+        self.assertEqual(len(table.columns), 2)
+        self.assertEqual(len(table.rows), 0)
+
     def test_natural_join1(self):
         string1 = '''
             Employees (ID, Name, Age, Dept) = {
@@ -770,6 +801,36 @@ class TestTable(unittest.TestCase):
 
     def test_division2(self):
         string1 = '''
+            Employees1 (ID, Name, Age, Dept, City) = {
+                1, John, 32, Finance, Ottawa
+                1, John, 32, Sales, Toronto
+                1, John, 32, HR, Vancouver
+                2, Alice, 28, Finance, Ottawa
+                2, Alice, 28, Sales, Toronto
+                2, Alice, 28, HR, Vancouver
+                3, Bob, 29, Finance, Ottawa
+                3, Bob, 29, Sales, Toronto
+                3, Bob, 29, HR, Vancouver
+            }
+        '''
+        string2 = '''
+            Employees2 (Dept, City) = {
+                Finance, Ottawa
+                Sales, Toronto
+                HR, Vancouver
+            }
+        '''
+        table = Table.division(Table(string1), Table(string2))
+        self.assertEqual(table.name, '')
+        self.assertEqual(len(table.columns), 3)
+        self.assertEqual(len(table.rows), 3)
+        self.assertEqual(table.columns, ['ID', 'Name', 'Age'])
+        self.assertEqual(table.rows[0], [1, 'John', 32])
+        self.assertEqual(table.rows[1], [2, 'Alice', 28])
+        self.assertEqual(table.rows[2], [3, 'Bob', 29])
+
+    def test_division3(self):
+        string1 = '''
             Employees1 (ID, Name, Age, Dept) = {
                 1, John, 32, Finance
                 1, John, 32, Sales
@@ -794,7 +855,7 @@ class TestTable(unittest.TestCase):
         self.assertEqual(table.rows[0], [1, 'John', 32])
         self.assertEqual(table.rows[1], [2, 'Alice', 28])
 
-    def test_division3(self):
+    def test_division4(self):
         string1 = '''
             Employees1 (ID, Name, Age, Dept, City) = {
                 1, John, 32, Finance, Ottawa
@@ -818,7 +879,7 @@ class TestTable(unittest.TestCase):
         with self.assertRaises(TableError):
             Table.division(Table(string1), Table(string2))
 
-    def test_division4(self):
+    def test_division5(self):
         string1 = '''
             Employees1 (ID, Name, Age, Dept) = {
                 1, John, 32, Finance
@@ -842,7 +903,7 @@ class TestTable(unittest.TestCase):
         with self.assertRaises(TableError):
             Table.division(Table(string1), Table(string2))
 
-    def test_division5(self):
+    def test_division6(self):
         string1 = '''
             Employees1 (ID, Name, Age, Dept) = {
                 1, John, 32, Finance
@@ -866,7 +927,7 @@ class TestTable(unittest.TestCase):
         with self.assertRaises(TableError):
             Table.division(Table(string1), Table(string2))
 
-    def test_division6(self):
+    def test_division7(self):
         string1 = '''
             Employees1 (ID, Name, Age, Dept) = {
                 1, John, 32, Finance

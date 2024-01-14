@@ -32,7 +32,7 @@ class QueryNode:
         self.nodes = []
 
     def parse(self, tables):
-        ''' Create child nodes, tables, and operators from the string and table. '''
+        ''' Create child nodes, tables, and operators from string and table. '''
         self.string = self.string.strip()
 
         # Check if node is a known table
@@ -44,7 +44,7 @@ class QueryNode:
 
         # Create child nodes
         string = self.string
-        for i in range(2):
+        while 1:
             node = self.extract(string)
             if not node:
                 break

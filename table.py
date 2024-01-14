@@ -182,7 +182,7 @@ class Table:
                     rows2.remove(match)
 
                 # Fill unmatched rows
-                if not matches and type.left():
+                if not matches and type.left_outer_join():
                     result.rows.append(row1 + empty1)
 
             # Find matches for second table
@@ -203,7 +203,7 @@ class Table:
                     rows1.remove(match)
 
                 # Fill unmatched rows
-                if not matches and type.right():
+                if not matches and type.right_outer_join():
                     result.rows.append(empty2 + row2)
 
         # Prepare for deleting duplicated columns

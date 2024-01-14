@@ -39,12 +39,12 @@ class TableOperator(enum.Enum):
             return ''
         return self.strings[0]
 
-    def left(self):
+    def left_outer_join(self):
         ''''''
         array = [TableOperator.LEFT_OUTER_JOIN, TableOperator.FULL_OUTER_JOIN]
         return self in array
 
-    def right(self):
+    def right_outer_join(self):
         ''''''
         array = [TableOperator.RIGHT_OUTER_JOIN, TableOperator.FULL_OUTER_JOIN]
         return self in array
