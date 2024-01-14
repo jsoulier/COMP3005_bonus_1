@@ -21,10 +21,11 @@ class Lexer:
         self.queries = []
 
     def extract(self, string):
-        ''' Populate tables and queries from string. '''
+        ''' Populate tables and queries. '''
         self.tables = []
         self.queries = []
 
+        # Keep track of table lines and names
         lines = string.splitlines()
         strings = []
         names = []
@@ -55,8 +56,14 @@ class Lexer:
             raise LexerError()
 
     def compute(self, string):
-        ''''''
+        ''' Compute tables. '''
         tables = []
+
+        # Extract and compute tables
+        self.extract(string)
+        for query in self.queries:
+            tables.append(query.compute())
+
         return tables
 
     @staticmethod
