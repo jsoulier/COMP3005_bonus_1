@@ -16,6 +16,10 @@ class TestTableOperator(unittest.TestCase):
         self.assertEqual(TableOperator.SELECTION, TableOperator.SELECTION2)
         self.assertNotEqual(TableOperator.SELECTION, TableOperator.PROJECTION)
         self.assertNotEqual(TableOperator.SELECTION, TableOperator.NONE)
+        self.assertEqual(TableOperator.SELECTION1, TableOperator.SELECTION2)
+        self.assertEqual(TableOperator.PROJECTION1, TableOperator.PROJECTION2)
+        self.assertEqual(TableOperator.MINUS1, TableOperator.MINUS2)
+        self.assertEqual(TableOperator.DIVISION1, TableOperator.DIVISION2)
 
     def test_bool(self):
         self.assertFalse(TableOperator.NONE)
@@ -44,21 +48,22 @@ class TestTableOperator(unittest.TestCase):
         self.assertEqual(len(TableOperator.FULL_OUTER_JOIN), 1)
         self.assertEqual(len(TableOperator.UNION), 1)
         self.assertEqual(len(TableOperator.INTERSECTION), 1)
-        self.assertEqual(len(TableOperator.MINUS), 1)
+        self.assertEqual(len(TableOperator.MINUS1), 1)
+        self.assertEqual(len(TableOperator.MINUS1), 1)
         self.assertEqual(len(TableOperator.DIVISION1), 1)
         self.assertEqual(len(TableOperator.DIVISION2), 1)
 
-    def test_left_outer_join(self):
-        self.assertFalse(TableOperator.NATURAL_JOIN.left_outer_join())
-        self.assertTrue(TableOperator.LEFT_OUTER_JOIN.left_outer_join())
-        self.assertFalse(TableOperator.RIGHT_OUTER_JOIN.left_outer_join())
-        self.assertTrue(TableOperator.FULL_OUTER_JOIN.left_outer_join())
+    def test_left(self):
+        self.assertFalse(TableOperator.NATURAL_JOIN.left())
+        self.assertTrue(TableOperator.LEFT_OUTER_JOIN.left())
+        self.assertFalse(TableOperator.RIGHT_OUTER_JOIN.left())
+        self.assertTrue(TableOperator.FULL_OUTER_JOIN.left())
 
-    def test_right_outer_join(self):
-        self.assertFalse(TableOperator.NATURAL_JOIN.right_outer_join())
-        self.assertFalse(TableOperator.LEFT_OUTER_JOIN.right_outer_join())
-        self.assertTrue(TableOperator.RIGHT_OUTER_JOIN.right_outer_join())
-        self.assertTrue(TableOperator.FULL_OUTER_JOIN.right_outer_join())
+    def test_right(self):
+        self.assertFalse(TableOperator.NATURAL_JOIN.right())
+        self.assertFalse(TableOperator.LEFT_OUTER_JOIN.right())
+        self.assertTrue(TableOperator.RIGHT_OUTER_JOIN.right())
+        self.assertTrue(TableOperator.FULL_OUTER_JOIN.right())
 
     def test_parametrize(self):
         self.assertTrue(TableOperator.NONE.parametrize(0))

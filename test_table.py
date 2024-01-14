@@ -84,7 +84,7 @@ class TestTable(unittest.TestCase):
         self.assertEqual(table.rows[2][0], 'Bob')
         self.assertEqual(table.rows[2][1], '_7200')
 
-    def test_init5(self):
+    def test_init4(self):
         string = '''
             Employees (ID, Name, Age) = {
                 1, Jaan Soulier, 32
@@ -95,7 +95,7 @@ class TestTable(unittest.TestCase):
         with self.assertRaises(TableError):
             Table(string)
 
-    def test_init6(self):
+    def test_init5(self):
         string = '''
             Employees (ID, Name, Age) = {
                 1, John, 32
@@ -107,7 +107,7 @@ class TestTable(unittest.TestCase):
         with self.assertRaises(TableError):
             Table(string)
 
-    def test_init7(self):
+    def test_init6(self):
         string = '''
             Employees (ID, Name Name, Age) = {
                 1, John, 32
@@ -118,7 +118,7 @@ class TestTable(unittest.TestCase):
         with self.assertRaises(TableError):
             Table(string)
 
-    def test_init8(self):
+    def test_init7(self):
         string = '''
             Employees Employees (ID, Name Name, Age) = {
                 1, John, 32
@@ -129,7 +129,7 @@ class TestTable(unittest.TestCase):
         with self.assertRaises(TableError):
             Table(string)
 
-    def test_init9(self):
+    def test_init8(self):
         string = '''
             Employees () = {
                 1, John, 32
@@ -139,7 +139,7 @@ class TestTable(unittest.TestCase):
         with self.assertRaises(TableError):
             Table(string)
 
-    def test_init10(self):
+    def test_init9(self):
         string = '''
             Employees (ID, Name, Age) = {
             }
@@ -152,7 +152,7 @@ class TestTable(unittest.TestCase):
         self.assertEqual(table.columns[1], 'Name')
         self.assertEqual(table.columns[2], 'Age')
 
-    def test_init11(self):
+    def test_init10(self):
         string = '''
             Employees () = {
             }
@@ -415,7 +415,7 @@ class TestTable(unittest.TestCase):
         self.assertEqual(table.rows[3], [2, 'Alice', 28, 'Network'])
         self.assertEqual(table.rows[4], [3, 'Bob', 29, 'Math'])
 
-    def test_left_outer_join(self):
+    def test_left(self):
         string1 = '''
             Employees (ID, Name, Age, Dept) = {
                 1, John, 32, Sales
@@ -439,7 +439,7 @@ class TestTable(unittest.TestCase):
         self.assertEqual(table.rows[1], [2, 'Alice', 28, 'Finance', 20000])
         self.assertEqual(table.rows[2], [3, 'Bob', 29, 'HR', ''])
 
-    def test_right_outer_join(self):
+    def test_right(self):
         string1 = '''
             Employees (ID, Name, Age, Dept) = {
                 1, John, 32, Sales

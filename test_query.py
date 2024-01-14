@@ -151,6 +151,7 @@ class TestQuery(unittest.TestCase):
         self.assertEqual(table.name, '')
         self.assertEqual(len(table.columns), 1)
         self.assertEqual(len(table.rows), 2)
+        self.assertEqual(table.columns, ['sid'])
         self.assertEqual(table.rows[0], [1])
         self.assertEqual(table.rows[1], [2])
 
@@ -186,6 +187,7 @@ class TestQuery(unittest.TestCase):
         self.assertEqual(table.name, '')
         self.assertEqual(len(table.columns), 4)
         self.assertEqual(len(table.rows), 2)
+        self.assertEqual(table.columns, ['id', 'name', 'email', 'Dept'])
         self.assertEqual(table.rows[0], [1, 'Alex', 'a@c', 'Sales'])
         self.assertEqual(table.rows[1], [2, 'John', 'j@c', 'Finance'])
 

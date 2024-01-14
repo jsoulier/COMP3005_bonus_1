@@ -15,12 +15,15 @@ class TableOperator(enum.Enum):
     FULL_OUTER_JOIN  = (7,  2, '\u27D7')
     UNION            = (8,  2, '\u222A')
     INTERSECTION     = (9,  2, '\u2229')
-    MINUS            = (10, 2, '\u2212')
+    MINUS1           = (10, 2, '\u2212')
+    MINUS2           = (10, 2, '-')
     DIVISION1        = (11, 2, '\u00F7')
     DIVISION2        = (11, 2, '/')
 
+    # Aliases
     SELECTION        = SELECTION1
     PROJECTION       = PROJECTION1
+    MINUS            = MINUS1
     DIVISION         = DIVISION1
 
     def __init__(self, id, operands, string):
@@ -49,12 +52,12 @@ class TableOperator(enum.Enum):
         ''''''
         return len(self.string)
 
-    def left_outer_join(self):
+    def left(self):
         ''''''
         array = [TableOperator.LEFT_OUTER_JOIN, TableOperator.FULL_OUTER_JOIN]
         return self in array
 
-    def right_outer_join(self):
+    def right(self):
         ''''''
         array = [TableOperator.RIGHT_OUTER_JOIN, TableOperator.FULL_OUTER_JOIN]
         return self in array

@@ -13,6 +13,7 @@ class Lexer:
         - tables (Table)
         - queries (Query)
     Parses a document and extracts tables and queries.
+    Handles table and query exceptions and passes back the offending string.
     '''
 
     def __init__(self):
@@ -46,14 +47,24 @@ class Lexer:
             # Add lines and complete table
             strings.append(line)
             if self.table_end(line):
-                table = Table('\n'.join(strings))
+                string = '\n'.join(strings)
+
+                # Pass back exceptions to user
+                try:
+                    table = Table(string)
+                except TableError:
+                    raise LexerError('Bad Table Formatting: {}'.format(string))
+                except:
+                    raise LexerError('Unknown Error: {}'.format(string))
+
+                # Reset tracking
                 self.tables.append(table)
                 names.append(table.name)
                 strings = []
 
         # Missing table end
         if strings:
-            raise LexerError()
+            raise LexerError('Unmatched Parenthesis')
 
     def compute(self, string):
         ''' Compute tables. '''
@@ -62,22 +73,31 @@ class Lexer:
         # Extract and compute tables
         self.extract(string)
         for query in self.queries:
-            tables.append(query.compute())
+
+            # Pass back exceptions to user
+            try:
+                tables.append(query.compute())
+            except QueryError:
+                raise LexerError('Bad Query Formatting: {}'.format(query.string))
+            except TableError:
+                raise LexerError('Invalid Table Operation: {}'.format(query.string))
+            except:
+                raise LexerError('Unknown Error: {}'.format(query.string))
 
         return tables
 
     @staticmethod
     def table_start(string):
-        ''' Check if string looks like it starts a table. '''
+        ''' Check if string starts a table. '''
         pattern = re.compile(r'.*\(.*\).*=.*\{.*')
         return pattern.search(string)
 
     @staticmethod
     def table_end(string):
-        ''' Check if string looks like it ends a table. '''
+        ''' Check if string ends a table. '''
         return '}' in string
 
     @staticmethod
     def query(string, names):
-        ''' Check if string looks like a query. '''
+        ''' Check if string is a query. '''
         return any(name in string for name in names)
