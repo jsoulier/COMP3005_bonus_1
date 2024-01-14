@@ -18,6 +18,9 @@ class TestTableOperator(unittest.TestCase):
         self.assertNotEqual(TableOperator.SELECTION, TableOperator.NONE)
         self.assertEqual(TableOperator.SELECTION1, TableOperator.SELECTION2)
         self.assertEqual(TableOperator.PROJECTION1, TableOperator.PROJECTION2)
+        self.assertEqual(TableOperator.CROSS_JOIN1, TableOperator.CROSS_JOIN2)
+        self.assertEqual(TableOperator.UNION1, TableOperator.UNION2)
+        self.assertEqual(TableOperator.INTERSECTION1, TableOperator.INTERSECTION2)
         self.assertEqual(TableOperator.MINUS1, TableOperator.MINUS2)
         self.assertEqual(TableOperator.DIVISION1, TableOperator.DIVISION2)
 

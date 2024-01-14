@@ -96,7 +96,6 @@ class QueryNode:
             return Table.minus(tables[0], tables[1])
         if self.table_operator == TableOperator.DIVISION:
             return Table.division(tables[0], tables[1])
-
         raise AssertionError()
 
     def splice(self, string):

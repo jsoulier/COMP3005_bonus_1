@@ -8,13 +8,18 @@ class TableOperator(enum.Enum):
     SELECTION2       = (1,  1, 'select')
     PROJECTION1      = (2,  1, '\u03C0')
     PROJECTION2      = (2,  1, 'pi')
-    CROSS_JOIN       = (3,  2, '\u00D7')
+    CROSS_JOIN1      = (3,  2, '\u00D7')
+    CROSS_JOIN2      = (3,  2, 'x')
+    CROSS_JOIN3      = (3,  2, 'X')
     NATURAL_JOIN     = (4,  2, '\u2A1D')
     LEFT_OUTER_JOIN  = (5,  2, '\u27D5')
     RIGHT_OUTER_JOIN = (6,  2, '\u27D6')
     FULL_OUTER_JOIN  = (7,  2, '\u27D7')
-    UNION            = (8,  2, '\u222A')
-    INTERSECTION     = (9,  2, '\u2229')
+    UNION1           = (8,  2, '\u222A')
+    UNION2           = (8,  2, 'u')
+    UNION3           = (8,  2, 'U')
+    INTERSECTION1    = (9,  2, '\u2229')
+    INTERSECTION2    = (9,  2, 'n')
     MINUS1           = (10, 2, '\u2212')
     MINUS2           = (10, 2, '-')
     DIVISION1        = (11, 2, '\u00F7')
@@ -23,6 +28,9 @@ class TableOperator(enum.Enum):
     # Aliases
     SELECTION        = SELECTION1
     PROJECTION       = PROJECTION1
+    CROSS_JOIN       = CROSS_JOIN1
+    UNION            = UNION1
+    INTERSECTION     = INTERSECTION1
     MINUS            = MINUS1
     DIVISION         = DIVISION1
 
