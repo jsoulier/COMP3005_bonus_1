@@ -564,12 +564,12 @@ class TestQueryNode(unittest.TestCase):
         string4 = '( string ) string'
         string5 = ' string ( string ) '
         string6 = ' string ( string )string '
-        node1 = QueryNode.parse_node(string1)
-        node2 = QueryNode.parse_node(string2)
-        node3 = QueryNode.parse_node(string3)
-        node4 = QueryNode.parse_node(string4)
-        node5 = QueryNode.parse_node(string5)
-        node6 = QueryNode.parse_node(string6)
+        node1 = QueryNode.extract(string1)
+        node2 = QueryNode.extract(string2)
+        node3 = QueryNode.extract(string3)
+        node4 = QueryNode.extract(string4)
+        node5 = QueryNode.extract(string5)
+        node6 = QueryNode.extract(string6)
         self.assertEqual(node1.string, 'string')
         self.assertEqual(node2.string, 'string string')
         self.assertEqual(node3.string, 'string ( string)')
@@ -583,5 +583,14 @@ class TestQueryNode(unittest.TestCase):
         self.assertEqual(string5[:node5.start] + string5[node5.end:], ' string  ')
         self.assertEqual(string6[:node6.start] + string6[node6.end:], ' string string ')
 
-    def test_unpack(self):
-        pass
+    def test_type(self):
+        self.assertEqual(QueryNode.type('select'), TableOperator.SELECTION2)
+        self.assertEqual(QueryNode.type(' select'), TableOperator.SELECTION2)
+        self.assertEqual(QueryNode.type('select '), TableOperator.SELECTION2)
+        self.assertEqual(QueryNode.type(' select '), TableOperator.SELECTION2)
+        self.assertEqual(QueryNode.type(' select ID > 1'), TableOperator.SELECTION2)
+        self.assertEqual(QueryNode.type('select ID>1 '), TableOperator.SELECTION2)
+        with self.assertRaises(QueryError):
+            self.assertEqual(QueryNode.type(''), TableOperator.NONE)
+        with self.assertRaises(QueryError):
+            self.assertEqual(QueryNode.type(' '), TableOperator.NONE)

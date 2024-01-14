@@ -45,46 +45,21 @@ class QueryNode:
         # Create child nodes
         string = self.string
         while 1:
-            node = self.parse_node(string)
+            node = self.extract(string)
             if not node:
                 break
             node.parse(tables)
             string = string[:node.start] + string[node.end:]
             self.nodes.append(node)
 
-        # Unpack the table operator
-        self.table_operator = self.parse_table_operator(string)
-        if self.table_operator.nodes != len(self.nodes):
-            raise QueryError()
+        self.table_operator = self.type(string)
 
-        self.string = self.strip(self.string)
+        string = self.splice(self.string)
+        strings = string.split(maxsplit=1)
 
-        # Separate the operator and parameters, again...
-        strings = self.string.split(maxsplit=1)
 
-        # Check for parameters
         if len(strings) > 1:
-
-            string = strings[1]
-
-            # Check for relational operator
-            for relational_operator in RelationalOperator:
-                if not relational_operator.within(string):
-                    continue
-                self.relational_operator = relational_operator
-                break
-
-            # Parse parameters
-            string = string.replace(',', ' ')
-            if self.relational_operator:
-                string = string.replace(str(self.relational_operator), ' {} '.format(self.relational_operator))
-            self.parameters = string.split()
-            if self.relational_operator:
-                # Ensure operator is not at the start or end
-                index = self.parameters.index(str(self.relational_operator))
-                if index != 1:
-                    raise QueryError()
-                self.parameters.pop(index)
+            self.parametrize(strings[1])
 
         # Ensure valid number of parameters
         if not self.table_operator.parametrize(len(self.parameters)):
@@ -95,9 +70,6 @@ class QueryNode:
         # Check if node is a leaf node
         if self.table:
             return self.table
-
-        assert self.nodes
-        assert self.table_operator
 
         # Get table arguments
         tables = []
@@ -131,17 +103,68 @@ class QueryNode:
             return Table.minus(tables[0], tables[1])
         if self.table_operator == TableOperator.DIVISION:
             return Table.division(tables[0], tables[1])
+
         raise AssertionError()
 
-    def strip(self, string):
-        ''' Strip out child nodes and verify ordering. '''
-        assert self.table_operator
-        assert self.nodes
-        if self.table_operator.nodes == 1:
+    def splice(self, string):
+        ''' Splice out child nodes and verify formatting. '''
+        # Ensure table operator correct operands
+        if self.table_operator.operands != len(self.nodes):
+            raise QueryError()
+
+        # Handle single operand table operators
+        if self.table_operator.operands == 1:
+
+            # Ensure node comes after the table operator
+            index1 = string.find(self.nodes[0].string)
+            index2 = string.find(str(self.table_operator))
+            if index1 < index2:
+                raise QueryError()
+
+            # Splice out node
             string = string[:self.nodes[0].start]
-        if self.table_operator.nodes == 2:
+
+        # Handle single operand table operators
+        if self.table_operator.operands == 2:
+
+            # Ensure nodes come before and after the table operator
+            index1 = string.find(self.nodes[0].string)
+            index2 = string.find(str(self.table_operator))
+            index3 = string.find(self.nodes[1].string)
+            if index1 > index2:
+                raise QueryError()
+            if index3 < index2:
+                raise QueryError()
+
+            # Splice out nodes
             string = string[self.nodes[0].end:self.nodes[0].end + self.nodes[1].start]
+
         return string
+
+    def parametrize(self, string):
+        ''' Parse parameters from a string. '''
+        string = string.strip()
+        if not string:
+            return
+
+        # Check for relational operator
+        for relational_operator in RelationalOperator:
+            if not relational_operator.within(string):
+                continue
+            self.relational_operator = relational_operator
+            break
+
+        # Parse parameters
+        string = string.replace(',', ' ')
+        if self.relational_operator:
+            string = string.replace(str(self.relational_operator), ' {} '.format(self.relational_operator))
+        self.parameters = string.split()
+        if self.relational_operator:
+            # Ensure operator is not at the start or end
+            index = self.parameters.index(str(self.relational_operator))
+            if index != 1:
+                raise QueryError()
+            self.parameters.pop(index)
 
     @staticmethod
     def pair(string):
@@ -163,8 +186,8 @@ class QueryNode:
         raise QueryError()
 
     @staticmethod
-    def parse_node(string):
-        ''' Parse node from a string. '''
+    def extract(string):
+        ''' Extract node from a string. '''
         node = QueryNode('')
         node.start = string.find('(')
         if node.start == -1:
@@ -176,17 +199,17 @@ class QueryNode:
         return node
 
     @staticmethod
-    def parse_table_operator(string):
-        ''' Parse table operator from a string. '''
+    def type(string):
+        ''' Get table operator type. '''
         # Separate the operator and parameters
         strings = string.split(maxsplit=1)
+        if not strings:
+            raise QueryError()
+        string = strings[0]
 
         # Find the table operator
         for table_operator in TableOperator:
-            if table_operator == strings[0]:
+            if table_operator == string:
                 return table_operator
-        raise QueryError()
 
-    @staticmethod
-    def parse_parameters(string):
-        ''' Parse parameters from a string. '''
+        raise QueryError()

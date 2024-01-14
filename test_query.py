@@ -53,13 +53,19 @@ class TestQuery(unittest.TestCase):
         with self.assertRaises(QueryError):
             query.compute('select ID > 1 1 (Employees)', tables)
         with self.assertRaises(QueryError):
+            query.compute('(Employees) select ID > 1', tables)
+        with self.assertRaises(QueryError):
             query.compute('pi Name (Employees)(Employees)', tables)
         with self.assertRaises(QueryError):
             query.compute('(Employees) {} (Employees)(Employees)'.format(TableOperator.CROSS_JOIN), tables)
-        # with self.assertRaises(QueryError):
-        #     query.compute('(Employees)(Employees) {}'.format(TableOperator.CROSS_JOIN), tables)
-        # with self.assertRaises(QueryError):
-        #     query.compute('{} (Employees)(Employees)'.format(TableOperator.CROSS_JOIN), tables)
+        with self.assertRaises(QueryError):
+            query.compute('(Employees)(Employees) {}'.format(TableOperator.CROSS_JOIN), tables)
+        with self.assertRaises(QueryError):
+            query.compute('{} (Employees)(Employees)'.format(TableOperator.CROSS_JOIN), tables)
+        with self.assertRaises(QueryError):
+            query.compute('{} (Employees) {} (Employees)'.format(TableOperator.CROSS_JOIN, TableOperator.CROSS_JOIN), tables)
+        with self.assertRaises(QueryError):
+            query.compute('(Employees) {} (Employees) {}'.format(TableOperator.CROSS_JOIN, TableOperator.CROSS_JOIN), tables)
         with self.assertRaises(QueryError):
             query.compute('pi Name (pi Name, Email (Employees)(Employees))', tables)
         with self.assertRaises(QueryError):

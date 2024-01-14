@@ -5,11 +5,15 @@ from table_operator import TableOperator
 class TestTableOperator(unittest.TestCase):
 
     def test_eq(self):
-        self.assertEqual(TableOperator.SELECTION, 'select')
-        self.assertEqual(TableOperator.PROJECTION, 'pi')
-        self.assertNotEqual(TableOperator.SELECTION, 'select2')
-        self.assertNotEqual(TableOperator.PROJECTION, '2pi')
+        self.assertEqual(TableOperator.SELECTION2, 'select')
+        self.assertEqual(TableOperator.PROJECTION2, 'pi')
+        self.assertNotEqual(TableOperator.SELECTION2, 'select2')
+        self.assertNotEqual(TableOperator.PROJECTION2, '2pi')
         self.assertEqual(TableOperator.SELECTION, TableOperator.SELECTION)
+        self.assertNotEqual(TableOperator.SELECTION, TableOperator.PROJECTION)
+        self.assertEqual(TableOperator.SELECTION, TableOperator.SELECTION)
+        self.assertEqual(TableOperator.SELECTION, TableOperator.SELECTION1)
+        self.assertEqual(TableOperator.SELECTION, TableOperator.SELECTION2)
         self.assertNotEqual(TableOperator.SELECTION, TableOperator.PROJECTION)
         self.assertNotEqual(TableOperator.SELECTION, TableOperator.NONE)
 
@@ -26,6 +30,23 @@ class TestTableOperator(unittest.TestCase):
         self.assertTrue(TableOperator.INTERSECTION)
         self.assertTrue(TableOperator.MINUS)
         self.assertTrue(TableOperator.DIVISION)
+
+    def test_bool(self):
+        self.assertEqual(len(TableOperator.NONE), 0)
+        self.assertEqual(len(TableOperator.SELECTION1), 1)
+        self.assertEqual(len(TableOperator.SELECTION2), 6)
+        self.assertEqual(len(TableOperator.PROJECTION1), 1)
+        self.assertEqual(len(TableOperator.PROJECTION2), 2)
+        self.assertEqual(len(TableOperator.CROSS_JOIN), 1)
+        self.assertEqual(len(TableOperator.NATURAL_JOIN), 1)
+        self.assertEqual(len(TableOperator.LEFT_OUTER_JOIN), 1)
+        self.assertEqual(len(TableOperator.RIGHT_OUTER_JOIN), 1)
+        self.assertEqual(len(TableOperator.FULL_OUTER_JOIN), 1)
+        self.assertEqual(len(TableOperator.UNION), 1)
+        self.assertEqual(len(TableOperator.INTERSECTION), 1)
+        self.assertEqual(len(TableOperator.MINUS), 1)
+        self.assertEqual(len(TableOperator.DIVISION1), 1)
+        self.assertEqual(len(TableOperator.DIVISION2), 1)
 
     def test_left_outer_join(self):
         self.assertFalse(TableOperator.NATURAL_JOIN.left_outer_join())

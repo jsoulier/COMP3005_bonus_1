@@ -3,30 +3,38 @@ import enum
 class TableOperator(enum.Enum):
     ''' The table operators and their textual representations. '''
 
-    NONE             = (0, [])
-    SELECTION        = (1, ['\u03C3', 'select'])
-    PROJECTION       = (1, ['\u03C0', 'pi'])
-    CROSS_JOIN       = (2, ['\u00D7'])
-    NATURAL_JOIN     = (2, ['\u2A1D'])
-    LEFT_OUTER_JOIN  = (2, ['\u27D5'])
-    RIGHT_OUTER_JOIN = (2, ['\u27D6'])
-    FULL_OUTER_JOIN  = (2, ['\u27D7'])
-    UNION            = (2, ['\u222A'])
-    INTERSECTION     = (2, ['\u2229'])
-    MINUS            = (2, ['\u2212'])
-    DIVISION         = (2, ['\u00F7', '/'])
+    NONE             = (0,  0, '')
+    SELECTION1       = (1,  1, '\u03C3')
+    SELECTION2       = (1,  1, 'select')
+    PROJECTION1      = (2,  1, '\u03C0')
+    PROJECTION2      = (2,  1, 'pi')
+    CROSS_JOIN       = (3,  2, '\u00D7')
+    NATURAL_JOIN     = (4,  2, '\u2A1D')
+    LEFT_OUTER_JOIN  = (5,  2, '\u27D5')
+    RIGHT_OUTER_JOIN = (6,  2, '\u27D6')
+    FULL_OUTER_JOIN  = (7,  2, '\u27D7')
+    UNION            = (8,  2, '\u222A')
+    INTERSECTION     = (9,  2, '\u2229')
+    MINUS            = (10, 2, '\u2212')
+    DIVISION1        = (11, 2, '\u00F7')
+    DIVISION2        = (11, 2, '/')
 
-    def __init__(self, nodes, strings):
+    SELECTION        = SELECTION1
+    PROJECTION       = PROJECTION1
+    DIVISION         = DIVISION1
+
+    def __init__(self, id, operands, string):
         ''''''
-        self.nodes = nodes
-        self.strings = strings
+        self.id = id
+        self.operands = operands
+        self.string = string
 
     def __eq__(self, other):
         ''' Compare with other or check if strings contain other. '''
         if isinstance(other, TableOperator):
-            return self.value == other.value
+            return self.id == other.id
         if isinstance(other, str):
-            return other in self.strings
+            return other in self.string
         raise AssertionError()
 
     def __bool__(self):
@@ -35,9 +43,11 @@ class TableOperator(enum.Enum):
 
     def __str__(self):
         ''''''
-        if not self.strings:
-            return ''
-        return self.strings[0]
+        return self.string
+    
+    def __len__(self):
+        ''''''
+        return len(self.string)
 
     def left_outer_join(self):
         ''''''
