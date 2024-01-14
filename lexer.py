@@ -57,6 +57,13 @@ class Lexer:
                 except:
                     raise LexerError('Unknown Error: {}'.format(string))
 
+                # Check if old table should be removed
+                for other in self.tables:
+                    if table.name != other.name:
+                        continue
+                    self.tables.remove(other)
+                    break
+
                 # Reset tracking
                 self.tables.append(table)
                 names.append(table.name)

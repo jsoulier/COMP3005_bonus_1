@@ -155,12 +155,41 @@ class TestLexer(unittest.TestCase):
                 2, Physics, 2
                 2, Network, 3
                 3, Network, 3
+            }
+            Stud_Course (cname, Hours) = {
+                Math, 3
+                Physics, 2
+                Network, 3
+            }
+        '''
+        lexer = Lexer()
+        lexer.extract(string)
+        self.assertEqual(len(lexer.tables), 1)
+        self.assertEqual(len(lexer.queries), 0)
+        self.assertEqual(lexer.tables[0].name, 'Stud_Course')
+        self.assertEqual(len(lexer.tables[0].columns), 2)
+        self.assertEqual(len(lexer.tables[0].rows), 3)
+        self.assertEqual(lexer.tables[0].columns, ['cname', 'Hours'])
+        self.assertEqual(lexer.tables[0].rows[0], ['Math', 3])
+        self.assertEqual(lexer.tables[0].rows[1], ['Physics', 2])
+        self.assertEqual(lexer.tables[0].rows[2], ['Network', 3])
+
+    def test_extract6(self):
+        string = '''
+            Stud_Course (sid, cname, mark) = {
+                1, Math, 3
+                1, Physics, 2
+                1, Network, 3
+                2, Math, 3
+                2, Physics, 2
+                2, Network, 3
+                3, Network, 3
         '''
         lexer = Lexer()
         with self.assertRaises(LexerError):
             lexer.extract(string)
 
-    def test_extract6(self):
+    def test_extract7(self):
         string = '''
             Stud_Course (sid, cname, mark) = {
                 1, Math, 3
@@ -181,7 +210,7 @@ class TestLexer(unittest.TestCase):
         with self.assertRaises(LexerError):
             lexer.extract(string)
 
-    def test_extract7(self):
+    def test_extract8(self):
         string = '''
             Stud_Course (id, cname, mark) = {
                 1, Math
@@ -272,6 +301,35 @@ class TestLexer(unittest.TestCase):
         self.assertEqual(tables[1].rows[1], [2, 'John', 'j@c', 'Finance'])
 
     def test_compute3(self):
+        string = '''
+            Stud_Course (sid, cname, mark) = {
+                1, Math, 3
+                1, Physics, 2
+                1, Network, 3
+                2, Math, 3
+                2, Physics, 2
+                2, Network, 3
+                3, Network, 3
+            }
+            Stud_Course (cname, Hours) = {
+                Math, 3
+                Physics, 2
+                Network, 3
+            }
+            pi cname Stud_Course
+        '''
+        lexer = Lexer()
+        tables = lexer.compute(string)
+        self.assertEqual(len(tables), 1)
+        self.assertEqual(tables[0].name, '')
+        self.assertEqual(len(tables[0].columns), 1)
+        self.assertEqual(len(tables[0].rows), 3)
+        self.assertEqual(tables[0].columns, ['cname'])
+        self.assertEqual(tables[0].rows[0], ['Math'])
+        self.assertEqual(tables[0].rows[1], ['Physics'])
+        self.assertEqual(tables[0].rows[2], ['Network'])
+
+    def test_compute4(self):
         string = '''
             Stud_Course (id, cname, mark) = {
                 1, Math, 3
