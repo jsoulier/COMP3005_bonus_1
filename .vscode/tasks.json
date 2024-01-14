@@ -1,0 +1,24 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "main",
+            "type": "shell",
+            "command": "python3",
+            "args": [
+                "main.py"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "test",
+            "type": "shell",
+            "command": "python3",
+            "args": [
+                "-m",
+                "unittest"
+            ],
+            "problemMatcher": []
+        },
+    ]
+}

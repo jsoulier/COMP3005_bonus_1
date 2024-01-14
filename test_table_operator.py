@@ -38,7 +38,7 @@ class TestTableOperator(unittest.TestCase):
         self.assertTrue(TableOperator.MINUS)
         self.assertTrue(TableOperator.DIVISION)
 
-    def test_bool(self):
+    def test_len(self):
         self.assertEqual(len(TableOperator.NONE), 0)
         self.assertEqual(len(TableOperator.SELECTION1), 1)
         self.assertEqual(len(TableOperator.SELECTION2), 6)
