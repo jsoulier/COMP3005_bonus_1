@@ -1,3 +1,4 @@
+import tkinter
 import tkinter.ttk as ttk
 
 class GUITable(ttk.Frame):
@@ -13,8 +14,8 @@ class GUITable(ttk.Frame):
             label.grid(row=0, column=x)
 
         # Underline columns
-        separator = ttk.Separator(self, orient='horizontal')
-        separator.grid(row=1, column=0, sticky='ew', columnspan=len(table.columns))
+        separator = ttk.Separator(self, orient=tkinter.HORIZONTAL)
+        separator.grid(row=1, column=0, sticky=tkinter.EW, columnspan=len(table.columns))
 
         # Add rows
         for y, row in enumerate(table.rows):
