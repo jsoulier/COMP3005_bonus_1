@@ -1,7 +1,8 @@
 import tkinter
 
+from gui_compute import GUICompute
 from gui_editor import GUIEditor
-from gui_menu import GUIMenu
+from gui_options import GUIOptions
 
 class GUI(tkinter.Tk):
     ''''''
@@ -14,11 +15,13 @@ class GUI(tkinter.Tk):
 
         # Add widgets
         self.editor = GUIEditor(self)
-        self.menu = GUIMenu(self, self.editor)
+        self.menu = GUIOptions(self, self.editor)
+        self.compute = GUICompute()
 
         # Configure menu
-        self.menu.on_execute = self.execute
+        self.menu.on_compute = self.on_compute
         self.configure(menu=self.menu)
 
-    def execute(self):
+    def on_compute(self):
         ''''''
+        self.compute.compute(self.editor.get())

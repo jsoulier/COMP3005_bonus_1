@@ -4,7 +4,7 @@ import tkinter.messagebox as messagebox
 
 from table_operator import TableOperator
 
-class GUIMenu(tkinter.Menu):
+class GUIOptions(tkinter.Menu):
     ''''''
 
     def __init__(self, master, editor):
@@ -16,7 +16,7 @@ class GUIMenu(tkinter.Menu):
         # Add main commands
         self.add_command(label='Open', command=self.open)
         self.add_command(label='Save', command=self.save)
-        self.add_command(label='Execute', command=self.execute)
+        self.add_command(label='Compute', command=self.compute)
 
         # Add table operator commands
         self.add_command(label='Operators:', columnbreak=tkinter.TRUE)
@@ -67,10 +67,10 @@ class GUIMenu(tkinter.Menu):
         ''''''
         self.editor.insert(string)
 
-    def on_execute(self):
+    def on_compute(self):
         ''''''
         raise NotImplementedError
     
-    def execute(self):
+    def compute(self):
         ''''''
-        self.on_execute()
+        self.on_compute()

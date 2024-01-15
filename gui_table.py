@@ -23,4 +23,4 @@ class GUITable(ttk.Frame):
                 label = ttk.Label(self, text=column)
                 label.grid(row=y+2, column=x)
 
-        self.grid()
+        self.grid(row=0, column=0, sticky=tkinter.NSEW)
