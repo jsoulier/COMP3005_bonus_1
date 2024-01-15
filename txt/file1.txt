@@ -1,0 +1,32 @@
+
+      
+Stud_Course (id, cname, mark) = { 
+                                     
+    1, Math, 3                
+    1, Physics, 2           
+    1, Network, 3          
+    2, Math, 3               
+    2, Physics, 2              
+           
+    2, Network, 3  
+    3, Network, 3        
+}                         
+         
+Course (cname, Hours) = {       
+                      
+    Math, 3  
+    Physics, 2     
+                   
+    Network, 3          
+}          
+(pi id, cname Stud_Course) / (pi cname Course) 
+        
+Student (id, name, email, Dept) = {          
+    1, Alex, a@c, Sales  
+
+    2, John, j@c, Finance 
+
+    3, Mo, m@c, HR
+}
+
+((pi id, cname Stud_Course) / (pi cname (Course))) ⨝ Student

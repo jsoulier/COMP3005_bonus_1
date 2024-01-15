@@ -12,7 +12,7 @@ class GUIEditor(ttk.Frame):
         self.text = tkinter.Text(self, wrap=tkinter.NONE)
         self.text.grid(row=0, column=0, sticky=tkinter.NSEW)
 
-        # Allow text widget to fill
+        # Allow fill
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)
 
@@ -27,11 +27,11 @@ class GUIEditor(ttk.Frame):
         self.pack(fill=tkinter.BOTH, expand=tkinter.TRUE)
 
     def insert(self, string):
-        ''' Insert string at cursor. '''
+        ''''''
         self.text.insert(tkinter.INSERT, string)
 
     def get(self):
-        ''' Get string and strip extra padding. '''
+        ''''''
         return self.text.get(1.0, tkinter.END)[:-1]
     
     def set(self, string):

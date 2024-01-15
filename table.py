@@ -67,6 +67,31 @@ class Table:
             if len(columns) != len(self.columns):
                 raise TableError()
 
+    def __str__(self):
+        ''''''
+        string = self.name
+        string += ' '
+        string += '('
+
+        # Add columns
+        for i, column in enumerate(self.columns):
+            string += column
+            if i < len(self.columns) - 1:
+                string += ', '
+        string += ') = {\n'
+
+        # Add rows
+        for row in self.rows:
+            string += '    '
+            for i, column in enumerate(row):
+                string += str(column)
+                if i < len(row) - 1:
+                    string += ', '
+            string += '\n'
+
+        string += '}'
+        return string
+
     @staticmethod
     def selection(table, column, comparator, value):
         ''''''

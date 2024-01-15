@@ -21,6 +21,10 @@ class Query:
         root = QueryNode(string)
         root.parse(self.tables)
         return root.compute()
+    
+    def __str__(self):
+        ''''''
+        return self.string
 
     @staticmethod
     def parenthesize(string1, string2):

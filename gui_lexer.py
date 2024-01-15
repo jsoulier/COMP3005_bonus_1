@@ -1,63 +1,52 @@
 import tkinter
-import tkinter.ttk as ttk
 
-from gui_table import GUITable
+from gui_editor import GUIEditor
 from lexer import Lexer
 
-class GUILexer(tkinter.Canvas):
+class GUILexer(tkinter.Toplevel):
     ''''''
 
-    def __init__(self, master, string):
+    def __init__(self):
         ''''''
+        super().__init__()
+        self.title('')
+        self.geometry('240x320')
 
-        string = '''
-            Stud_Course (sid, cname, mark) = {
-                1, Math, 3
-                1, Physics, 2
-                1, Network, 3
-                2, Math, 3
-                2, Physics, 2
-                2, Network, 3
-                3, Network, 3
-            }
-            Course (cname, Hours) = {
-                Math, 3
-                Physics, 2
-                Network, 3
-            }
-            (pi sid, cname Stud_Course) / (pi cname Course)
-            pi sid Stud_Course
-            pi cname, Hours Course
-        '''
-        lexer = Lexer()
-        tables = lexer.compute(string)
-        queries = lexer.queries
+        # Hide window until compute
+        self.protocol('WM_DELETE_WINDOW', self.quit)
+        self.quit()
 
-        super().__init__(master)
-        self.grid(row=0, column=0, sticky=tkinter.NSEW)
+        self.editor = GUIEditor(self)
+        self.lexer = Lexer()
 
-        self.scrollbar = ttk.Scrollbar(self, orient=tkinter.VERTICAL, command=self.yview)
-        self.scrollbar.grid(row=0, column=1, sticky=tkinter.NS)
+    def quit(self):
+        ''''''
+        # Disable destroying window
+        self.iconify()
 
-        self.configure(yscrollcommand=self.scrollbar.set)
+    def compute(self, string):
+        ''''''
+        self.deiconify()
 
-        self.frame = ttk.Frame(self)
-        self.create_window((0, 0), window=self.frame, anchor=tkinter.NW)
+        # Enable editing and clear
+        self.editor.text.config(state=tkinter.NORMAL)
+        self.editor.set('')
 
-        for i, [query, table] in enumerate(zip(queries, tables)):
+        try:
+            # Try to print tables and queries
+            tables = self.lexer.compute(string)
+            queries = self.lexer.queries
+            for i, [table, query] in enumerate(zip(tables, queries)):
+                table.name = 'Table' + str(i)
+                self.editor.insert(query)
+                self.editor.insert(' =\n')
+                self.editor.insert(table)
+                self.editor.insert('\n\n')
 
-            frame = ttk.LabelFrame(self.frame, text=query.string)
-            frame.grid(row=i, column=0, sticky=tkinter.NSEW)
-            frame.grid_columnconfigure(0, weight=1)
-            frame.grid_rowconfigure(0, weight=1)
-            frame = GUITable(frame, table)
+        # If bad formatting or computing, print error
+        except Exception as e:
+            self.editor.insert(str(e))
+            print(e)
 
-        self.frame.update_idletasks()
-        self.config(scrollregion=self.bbox("all"))
-
-        master.grid_rowconfigure(0, weight=1)
-        master.grid_columnconfigure(0, weight=1)
-        self.grid_rowconfigure(0, weight=1)
-        self.grid_columnconfigure(0, weight=1)
-        self.frame.grid_columnconfigure(0, weight=1)
-        self.frame.grid_rowconfigure(0, weight=1)
+        # Disable editing
+        self.editor.text.config(state=tkinter.DISABLED)

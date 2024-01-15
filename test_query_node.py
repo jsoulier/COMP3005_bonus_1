@@ -530,6 +530,38 @@ class TestQueryNode(unittest.TestCase):
         self.assertEqual(table.rows[1], [2, 'Alice', 28, 'Finance', 20000])
         self.assertEqual(table.rows[2], [3, 'Bob', 29, 'HR', 25000])
 
+    def test_compute6(self):
+        string1 = '''
+            Employees (ID, Name, Age, Dept) = {
+                1, John, 32, Finance
+                1, John, 32, Sales
+                1, John, 32, HR
+                2, Alice, 28, Finance
+                2, Alice, 28, Sales
+                2, Alice, 28, HR
+                3, Bob, 29, Finance
+                3, Bob, 29, Sales
+                3, Bob, 29, HR
+            }
+        '''
+        string2 = '''
+            Department (Dept) = {
+                Finance
+                Sales
+                HR
+            }
+        '''
+        root = QueryNode('(Employees) / (Department)')
+        root.parse([Table(string1), Table(string2)])
+        table = root.compute()
+        self.assertEqual(table.name, '')
+        self.assertEqual(len(table.columns), 3)
+        self.assertEqual(len(table.rows), 3)
+        self.assertEqual(table.columns, ['ID', 'Name', 'Age'])
+        self.assertEqual(table.rows[0], [1, 'John', 32])
+        self.assertEqual(table.rows[1], [2, 'Alice', 28])
+        self.assertEqual(table.rows[2], [3, 'Bob', 29])
+
     def test_pair1(self):
         self.assertEqual(QueryNode.pair('()'), 1)
         self.assertEqual(QueryNode.pair('(  )'), 3)

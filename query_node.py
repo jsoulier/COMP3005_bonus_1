@@ -122,7 +122,7 @@ class QueryNode:
             # Ensure nodes come before and after the table operator
             index1 = string.find(self.nodes[0].string)
             index2 = string.find(str(self.table_operator))
-            index3 = string.find(self.nodes[1].string)
+            index3 = string.rfind(self.nodes[1].string)
             if index1 > index2:
                 raise QueryError()
             if index3 < index2:

@@ -19,18 +19,17 @@ class GUIOptions(tkinter.Menu):
         self.add_command(label='Compute', command=self.compute)
 
         # Add table operator commands
-        self.add_command(label='Operators:', columnbreak=tkinter.TRUE)
-        self.add_command(label=TableOperator.SELECTION, command=lambda: self.insert(TableOperator.SELECTION))
-        self.add_command(label=TableOperator.PROJECTION, command=lambda: self.insert(TableOperator.PROJECTION))
-        self.add_command(label=TableOperator.CROSS_JOIN, command=lambda: self.insert(TableOperator.CROSS_JOIN))
-        self.add_command(label=TableOperator.NATURAL_JOIN, command=lambda: self.insert(TableOperator.NATURAL_JOIN))
-        self.add_command(label=TableOperator.LEFT_OUTER_JOIN, command=lambda: self.insert(TableOperator.LEFT_OUTER_JOIN))
-        self.add_command(label=TableOperator.RIGHT_OUTER_JOIN, command=lambda: self.insert(TableOperator.RIGHT_OUTER_JOIN))
-        self.add_command(label=TableOperator.FULL_OUTER_JOIN, command=lambda: self.insert(TableOperator.FULL_OUTER_JOIN))
-        self.add_command(label=TableOperator.UNION, command=lambda: self.insert(TableOperator.UNION))
-        self.add_command(label=TableOperator.INTERSECTION, command=lambda: self.insert(TableOperator.INTERSECTION))
-        self.add_command(label=TableOperator.MINUS, command=lambda: self.insert(TableOperator.MINUS))
-        self.add_command(label=TableOperator.DIVISION, command=lambda: self.insert(TableOperator.DIVISION))
+        self.add_command(label=TableOperator.SELECTION, command=lambda: self.editor.insert(TableOperator.SELECTION), columnbreak=tkinter.TRUE)
+        self.add_command(label=TableOperator.PROJECTION, command=lambda: self.editor.insert(TableOperator.PROJECTION))
+        self.add_command(label=TableOperator.CROSS_JOIN, command=lambda: self.editor.insert(TableOperator.CROSS_JOIN))
+        self.add_command(label=TableOperator.NATURAL_JOIN, command=lambda: self.editor.insert(TableOperator.NATURAL_JOIN))
+        self.add_command(label=TableOperator.LEFT_OUTER_JOIN, command=lambda: self.editor.insert(TableOperator.LEFT_OUTER_JOIN))
+        self.add_command(label=TableOperator.RIGHT_OUTER_JOIN, command=lambda: self.editor.insert(TableOperator.RIGHT_OUTER_JOIN))
+        self.add_command(label=TableOperator.FULL_OUTER_JOIN, command=lambda: self.editor.insert(TableOperator.FULL_OUTER_JOIN))
+        self.add_command(label=TableOperator.UNION, command=lambda: self.editor.insert(TableOperator.UNION))
+        self.add_command(label=TableOperator.INTERSECTION, command=lambda: self.editor.insert(TableOperator.INTERSECTION))
+        self.add_command(label=TableOperator.MINUS, command=lambda: self.editor.insert(TableOperator.MINUS))
+        self.add_command(label=TableOperator.DIVISION, command=lambda: self.editor.insert(TableOperator.DIVISION))
 
     def open(self):
         ''''''
@@ -46,7 +45,7 @@ class GUIOptions(tkinter.Menu):
 
         # Ensure user wants to override
         if self.editor.get():
-            result = messagebox.askyesno('Yes/No', 'Do you want to overwrite the contents?')
+            result = messagebox.askyesno('Yes/No', 'Anything unsaved will be lost. Continue?')
             if not result:
                 return
             
@@ -62,10 +61,6 @@ class GUIOptions(tkinter.Menu):
         # Write string into file
         with open(path, 'w', encoding='utf-8') as file:
             file.write(self.editor.get())
-
-    def insert(self, string):
-        ''''''
-        self.editor.insert(string)
 
     def on_compute(self):
         ''''''

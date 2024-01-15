@@ -1,7 +1,7 @@
 import tkinter
 
-from gui_compute import GUICompute
 from gui_editor import GUIEditor
+from gui_lexer import GUILexer
 from gui_options import GUIOptions
 
 class GUI(tkinter.Tk):
@@ -16,7 +16,7 @@ class GUI(tkinter.Tk):
         # Add widgets
         self.editor = GUIEditor(self)
         self.menu = GUIOptions(self, self.editor)
-        self.compute = GUICompute()
+        self.lexer = GUILexer()
 
         # Configure menu
         self.menu.on_compute = self.on_compute
@@ -24,4 +24,4 @@ class GUI(tkinter.Tk):
 
     def on_compute(self):
         ''''''
-        self.compute.compute(self.editor.get())
+        self.lexer.compute(self.editor.get())

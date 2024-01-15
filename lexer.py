@@ -53,9 +53,9 @@ class Lexer:
                 try:
                     table = Table(string)
                 except TableError:
-                    raise LexerError('Bad Table Formatting: {}'.format(string))
+                    raise LexerError('Bad Table Formatting:\n{}'.format(string))
                 except:
-                    raise LexerError('Unknown Error: {}'.format(string))
+                    raise LexerError('Unknown Error:\n{}'.format(string))
 
                 # Check if old table should be removed
                 for other in self.tables:
@@ -71,7 +71,7 @@ class Lexer:
 
         # Missing table end
         if strings:
-            raise LexerError('Unmatched Parenthesis')
+            raise LexerError('Unmatched Parentheses')
 
     def compute(self, string):
         ''' Compute tables. '''
@@ -85,11 +85,11 @@ class Lexer:
             try:
                 tables.append(query.compute())
             except QueryError:
-                raise LexerError('Bad Query Formatting: {}'.format(query.string))
+                raise LexerError('Bad Query Formatting:\n{}'.format(query))
             except TableError:
-                raise LexerError('Invalid Table Operation: {}'.format(query.string))
+                raise LexerError('Invalid Table Operation:\n{}'.format(query))
             except:
-                raise LexerError('Unknown Error: {}'.format(query.string))
+                raise LexerError('Unknown Error:\n{}'.format(query))
 
         return tables
 

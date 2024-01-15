@@ -1,0 +1,16 @@
+
+      
+Stud_Course (id, cname, mark) = { 
+                                     
+    1, Math, 3                
+    1, Physics, 2           
+    1, Network, 3          
+    2, Math, 3               
+    2, Physics, 2              
+           
+    2, Network, 3  
+    3, Network, 3        
+}                         
+         
+Stud_Course × Course
+        

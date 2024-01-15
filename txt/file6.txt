@@ -1,0 +1,19 @@
+Stud_Course (ID, Name, Age, Dept) = {
+    1, John, 32, Finance
+    1, John, 32, Sales
+    1, John, 32, HR
+    2, Alice, 28, Finance
+    2, Alice, 28, Sales
+    2, Alice, 28, HR
+    3, Bob, 29, Finance
+    3, Bob, 29, Sales
+    3, Bob, 29, HR
+}
+
+Course (Dept) = {
+    Finance
+    Sales
+    HR
+}
+
+Stud_Course / Course

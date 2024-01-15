@@ -162,6 +162,30 @@ class TestTable(unittest.TestCase):
         self.assertEqual(len(table.columns), 0)
         self.assertEqual(len(table.rows), 0)
 
+    def test_str1(self):
+        string = ''
+        string += 'Employees (ID, Name, Age) = {\n'
+        string += '    1, John, 32\n'
+        string += '    2, Alice, 28\n'
+        string += '    3, Bob, 29\n'
+        string += '}'
+        table = Table(string)
+        self.assertEqual(str(table), string)
+
+    def test_str2(self):
+        string = ''
+        string += 'Employees (ID, Name, Age) = {\n'
+        string += '}'
+        table = Table(string)
+        self.assertEqual(str(table), string)
+
+    def test_str3(self):
+        string = ''
+        string += 'Employees () = {\n'
+        string += '}'
+        table = Table(string)
+        self.assertEqual(str(table), string)
+
     def test_selection1(self):
         string = '''
             Employees (ID, Name, Age) = {
