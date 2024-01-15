@@ -4,23 +4,34 @@ import tkinter.ttk as ttk
 class GUIEditor(tkinter.Frame):
     ''''''
 
-    def __init__(self, owner):
+    def __init__(self, master):
         ''''''
-        super().__init__(owner)
-
-        # Packing for text widget
-        self.pack(fill=tkinter.BOTH, expand=tkinter.TRUE)
+        super().__init__(master)
+        self.pack(side=tkinter.BOTTOM, fill=tkinter.BOTH, expand=tkinter.TRUE)
         self.columnconfigure(0, weight=1)
         self.rowconfigure(0, weight=1)
 
         # Create text widget
-        text = tkinter.Text(self, wrap=tkinter.NONE)
-        text.grid(row=0, column=0, sticky=tkinter.NSEW)
+        self.text = tkinter.Text(self, wrap=tkinter.NONE)
+        self.text.grid(row=0, column=0, sticky=tkinter.NSEW)
 
         # Create scrollbars
-        scrollbar1 = ttk.Scrollbar(self, orient=tkinter.VERTICAL, command=text.yview)
-        scrollbar2 = ttk.Scrollbar(self, orient=tkinter.HORIZONTAL, command=text.xview)
-        scrollbar1.grid(row=0, column=1, sticky=tkinter.NS)
-        scrollbar2.grid(row=1, column=0, sticky=tkinter.EW)
-        text.configure(yscrollcommand=scrollbar1.set)
-        text.configure(xscrollcommand=scrollbar2.set)
+        self.scrollbar1 = ttk.Scrollbar(self, orient=tkinter.VERTICAL, command=self.text.yview)
+        self.scrollbar2 = ttk.Scrollbar(self, orient=tkinter.HORIZONTAL, command=self.text.xview)
+        self.scrollbar1.grid(row=0, column=1, sticky=tkinter.NS)
+        self.scrollbar2.grid(row=1, column=0, sticky=tkinter.EW)
+        self.text.configure(yscrollcommand=self.scrollbar1.set)
+        self.text.configure(xscrollcommand=self.scrollbar2.set)
+
+    def insert(self, string):
+        ''''''
+        self.text.insert(tkinter.INSERT, string)
+
+    def get(self):
+        ''''''
+        return self.text.get(1.0, tkinter.END)[1:]
+    
+    def set(self, string):
+        ''''''
+        self.text.delete(1.0, tkinter.END)
+        self.text.insert(tkinter.END, string)

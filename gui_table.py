@@ -4,9 +4,9 @@ import tkinter.ttk as ttk
 class GUITable(ttk.Frame):
     ''''''
 
-    def __init__(self, owner, table):
+    def __init__(self, master, table):
         ''''''
-        super().__init__(owner)
+        super().__init__(master)
 
         # Add columns
         for x, column in enumerate(table.columns):
