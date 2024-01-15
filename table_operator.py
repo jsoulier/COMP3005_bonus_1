@@ -20,8 +20,8 @@ class TableOperator(enum.Enum):
     UNION3           = (8,  2, 'U')
     INTERSECTION1    = (9,  2, '\u2229')
     INTERSECTION2    = (9,  2, 'n')
-    MINUS1           = (10, 2, '\u2212')
-    MINUS2           = (10, 2, '-')
+    SUBTRACTION1     = (10, 2, '\u2212')
+    SUBTRACTION2     = (10, 2, '-')
     DIVISION1        = (11, 2, '\u00F7')
     DIVISION2        = (11, 2, '/')
 
@@ -31,7 +31,7 @@ class TableOperator(enum.Enum):
     CROSS_JOIN       = CROSS_JOIN1
     UNION            = UNION1
     INTERSECTION     = INTERSECTION1
-    MINUS            = MINUS1
+    SUBTRACTION      = SUBTRACTION1
     DIVISION         = DIVISION1
 
     def __init__(self, id, operands, string):
@@ -92,7 +92,7 @@ class TableOperator(enum.Enum):
             return count == 0
         if self == TableOperator.INTERSECTION:
             return count == 0
-        if self == TableOperator.MINUS:
+        if self == TableOperator.SUBTRACTION:
             return count == 0
         if self == TableOperator.DIVISION:
             return count == 0

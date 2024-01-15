@@ -28,7 +28,7 @@ class GUIOptions(tkinter.Menu):
         self.add_command(label=TableOperator.FULL_OUTER_JOIN, command=lambda: self.editor.insert(TableOperator.FULL_OUTER_JOIN))
         self.add_command(label=TableOperator.UNION, command=lambda: self.editor.insert(TableOperator.UNION))
         self.add_command(label=TableOperator.INTERSECTION, command=lambda: self.editor.insert(TableOperator.INTERSECTION))
-        self.add_command(label=TableOperator.MINUS, command=lambda: self.editor.insert(TableOperator.MINUS))
+        self.add_command(label=TableOperator.SUBTRACTION, command=lambda: self.editor.insert(TableOperator.SUBTRACTION))
         self.add_command(label=TableOperator.DIVISION, command=lambda: self.editor.insert(TableOperator.DIVISION))
 
     def open(self):

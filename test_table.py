@@ -725,7 +725,7 @@ class TestTable(unittest.TestCase):
         self.assertEqual(table.rows[1], [2, 'Alice', 28])
         self.assertEqual(table.rows[2], [3, 'Bob', 29])
 
-    def test_minus1(self):
+    def test_subtraction1(self):
         string1 = '''
             Employees1 (ID, Name, Age) = {
                 1, John, 32
@@ -740,7 +740,7 @@ class TestTable(unittest.TestCase):
                 5, Mo, 27
             }
         '''
-        table = Table.minus(Table(string1), Table(string2))
+        table = Table.subtraction(Table(string1), Table(string2))
         self.assertEqual(table.name, '')
         self.assertEqual(len(table.columns), 3)
         self.assertEqual(len(table.rows), 2)
@@ -748,7 +748,7 @@ class TestTable(unittest.TestCase):
         self.assertEqual(table.rows[0], [2, 'Alice', 28])
         self.assertEqual(table.rows[1], [3, 'Bob', 29])
 
-    def test_minus2(self):
+    def test_subtraction2(self):
         string1 = '''
             Employees1 (ID, Name, Age) = {
                 1, John, 32
@@ -763,7 +763,7 @@ class TestTable(unittest.TestCase):
                 5, Mo, 27
             }
         '''
-        table = Table.minus(Table(string1), Table(string2))
+        table = Table.subtraction(Table(string1), Table(string2))
         self.assertEqual(table.name, '')
         self.assertEqual(len(table.columns), 3)
         self.assertEqual(len(table.rows), 3)
@@ -772,7 +772,7 @@ class TestTable(unittest.TestCase):
         self.assertEqual(table.rows[1], [2, 'Alice', 28])
         self.assertEqual(table.rows[2], [3, 'Bob', 29])
 
-    def test_minus3(self):
+    def test_subtraction3(self):
         string1 = '''
             Employees1 (ID, Name, Age) = {
                 1, John, 32
@@ -787,7 +787,7 @@ class TestTable(unittest.TestCase):
                 3, Bob, 29
             }
         '''
-        table = Table.minus(Table(string1), Table(string2))
+        table = Table.subtraction(Table(string1), Table(string2))
         self.assertEqual(table.name, '')
         self.assertEqual(len(table.columns), 3)
         self.assertEqual(len(table.rows), 0)

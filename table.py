@@ -315,7 +315,7 @@ class Table:
         return result
 
     @staticmethod
-    def minus(table1, table2):
+    def subtraction(table1, table2):
         ''''''
         # Ensure columns match
         for column in table1.columns:

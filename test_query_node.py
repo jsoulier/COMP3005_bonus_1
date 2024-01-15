@@ -351,10 +351,10 @@ class TestQueryNode(unittest.TestCase):
                 HR, 25000
             }
         '''
-        root = QueryNode('(Employees) {} (Department)'.format(TableOperator.MINUS))
+        root = QueryNode('(Employees) {} (Department)'.format(TableOperator.SUBTRACTION))
         root.parse([Table(string1), Table(string2)])
         self.assertFalse(root.table)
-        self.assertEqual(root.table_operator, TableOperator.MINUS)
+        self.assertEqual(root.table_operator, TableOperator.SUBTRACTION)
         self.assertFalse(root.relational_operator)
         self.assertFalse(root.parameters)
         self.assertEqual(len(root.nodes), 2)

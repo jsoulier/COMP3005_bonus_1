@@ -92,8 +92,8 @@ class QueryNode:
             return Table.union(tables[0], tables[1])
         if self.table_operator == TableOperator.INTERSECTION:
             return Table.intersection(tables[0], tables[1])
-        if self.table_operator == TableOperator.MINUS:
-            return Table.minus(tables[0], tables[1])
+        if self.table_operator == TableOperator.SUBTRACTION:
+            return Table.subtraction(tables[0], tables[1])
         if self.table_operator == TableOperator.DIVISION:
             return Table.division(tables[0], tables[1])
         raise AssertionError()

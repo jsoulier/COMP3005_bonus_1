@@ -21,7 +21,7 @@ class TestTableOperator(unittest.TestCase):
         self.assertEqual(TableOperator.CROSS_JOIN1, TableOperator.CROSS_JOIN2)
         self.assertEqual(TableOperator.UNION1, TableOperator.UNION2)
         self.assertEqual(TableOperator.INTERSECTION1, TableOperator.INTERSECTION2)
-        self.assertEqual(TableOperator.MINUS1, TableOperator.MINUS2)
+        self.assertEqual(TableOperator.SUBTRACTION1, TableOperator.SUBTRACTION2)
         self.assertEqual(TableOperator.DIVISION1, TableOperator.DIVISION2)
 
     def test_bool(self):
@@ -35,7 +35,7 @@ class TestTableOperator(unittest.TestCase):
         self.assertTrue(TableOperator.FULL_OUTER_JOIN)
         self.assertTrue(TableOperator.UNION)
         self.assertTrue(TableOperator.INTERSECTION)
-        self.assertTrue(TableOperator.MINUS)
+        self.assertTrue(TableOperator.SUBTRACTION)
         self.assertTrue(TableOperator.DIVISION)
 
     def test_len(self):
@@ -51,8 +51,8 @@ class TestTableOperator(unittest.TestCase):
         self.assertEqual(len(TableOperator.FULL_OUTER_JOIN), 1)
         self.assertEqual(len(TableOperator.UNION), 1)
         self.assertEqual(len(TableOperator.INTERSECTION), 1)
-        self.assertEqual(len(TableOperator.MINUS1), 1)
-        self.assertEqual(len(TableOperator.MINUS1), 1)
+        self.assertEqual(len(TableOperator.SUBTRACTION1), 1)
+        self.assertEqual(len(TableOperator.SUBTRACTION1), 1)
         self.assertEqual(len(TableOperator.DIVISION1), 1)
         self.assertEqual(len(TableOperator.DIVISION2), 1)
 
@@ -98,9 +98,9 @@ class TestTableOperator(unittest.TestCase):
         self.assertTrue(TableOperator.INTERSECTION.parametrize(0))
         self.assertFalse(TableOperator.INTERSECTION.parametrize(1))
         self.assertFalse(TableOperator.INTERSECTION.parametrize(2))
-        self.assertTrue(TableOperator.MINUS.parametrize(0))
-        self.assertFalse(TableOperator.MINUS.parametrize(1))
-        self.assertFalse(TableOperator.MINUS.parametrize(2))
+        self.assertTrue(TableOperator.SUBTRACTION.parametrize(0))
+        self.assertFalse(TableOperator.SUBTRACTION.parametrize(1))
+        self.assertFalse(TableOperator.SUBTRACTION.parametrize(2))
         self.assertTrue(TableOperator.DIVISION.parametrize(0))
         self.assertFalse(TableOperator.DIVISION.parametrize(1))
         self.assertFalse(TableOperator.DIVISION.parametrize(2))
