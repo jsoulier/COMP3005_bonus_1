@@ -39,6 +39,10 @@ class TableElement:
             return 'null'
         return str(self.value)
     
+    def __hash__(self):
+        ''''''
+        return hash(str(self.value))
+    
     def __repr__(self):
         ''''''
         return str(self.value)

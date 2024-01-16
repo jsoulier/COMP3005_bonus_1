@@ -336,56 +336,52 @@ class Table:
     @staticmethod
     def division(table1, table2):
         ''''''
-        x1 = len(table1.columns)
-        y1 = len(table1.rows)
-        x2 = len(table2.columns)
-        y2 = len(table2.rows)
-
-        # Ensure columns match
-        for column in table1.columns[-x2:]:
-            if column not in table2.columns:
-                raise TableError()
-
-        # Ensure tables are formatted correctly
-        for i in range(y1):
-            rowA = []
-            rowB = []
-
-            for j in range(y2):
-
-                # Compute the row indices
-                index1 = i * y2 + j
-                index2 = i + y2 * j
-
-                # When first table rows are not multiple of second table
-                if index1 >= y1 // y2 * y2:
-                    continue
-                if index2 >= y1 // y2 * y2:
-                    continue
-
-                # Find the correct rows
-                row1 = table1.rows[index1][:x1 - x2]
-                row2 = table1.rows[index2][x1 - x2:]
-
-                # First iteration
-                if not rowA and not rowB:
-                    rowA = row1
-                    rowB = row2
-
-                # Ensure first table rows are correct
-                if rowA != row1 or rowB != row2:
-                    raise TableError()
-
-                # Ensure second table rows correspond to first table
-                if row2 != table2.rows[i]:
-                    raise TableError()
+        # Division by zero
+        if not table2.rows:
+            raise TableError()
 
         result = Table('')
-        result.columns = table1.columns[:x1 - x2]
+        result.columns = copy.deepcopy(table1.columns)
 
-        # Compute the division
-        for i in range(y1 // y2):
-            row = table1.rows[i * y2][:x1 - x2]
-            result.rows.append(row)
+        # Remove columns from table
+        flag = 0
+        for column in table2.columns:
+            if column not in table1.columns:
+                flag = 1
+                continue
+            result.columns.remove(column)
+        if flag:
+            return result
+
+        # Create hash for each left row to each right row
+        rows = {}
+        for row1 in table1.rows:
+            row_l = tuple(row1[:-len(table2.columns)])
+            row_r = tuple(row1[-len(table2.columns):])
+            if row_l not in rows:
+                rows[row_l] = {}
+            if row_r not in rows[row_l]:
+                rows[row_l][row_r] = 0
+            rows[row_l][row_r] += 1
+
+        # Check if left rows contain all the required right rows
+        for row_l, rows_r in rows.items():
+            i = -1
+            for row2 in table2.rows:
+                row2 = tuple(row2)
+
+                # Count the number of valid rows
+                if row2 in rows_r:
+                    if i == -1:
+                        i = rows_r[row2]
+                    i = min(i, rows_r[row2])
+                else:
+                    i = -1
+                    break
+
+            # Add the valid rows
+            i = max(i, 0)
+            for j in range(i):
+                result.rows.append(list(row_l))
 
         return result

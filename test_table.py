@@ -900,8 +900,10 @@ class TestTable(unittest.TestCase):
                 HR, Vancouver
             }
         '''
-        with self.assertRaises(TableError):
-            Table.division(Table(string1), Table(string2))
+        table = Table.division(Table(string1), Table(string2))
+        self.assertEqual(len(table.columns), 4)
+        self.assertEqual(len(table.rows), 0)
+        self.assertEqual(table.columns, ['ID', 'Name', 'Age', 'City'])
 
     def test_division5(self):
         string1 = '''
@@ -924,8 +926,10 @@ class TestTable(unittest.TestCase):
                 IT
             }
         '''
-        with self.assertRaises(TableError):
-            Table.division(Table(string1), Table(string2))
+        table = Table.division(Table(string1), Table(string2))
+        self.assertEqual(len(table.columns), 3)
+        self.assertEqual(len(table.rows), 0)
+        self.assertEqual(table.columns, ['ID', 'Name', 'Age'])
 
     def test_division6(self):
         string1 = '''
@@ -948,8 +952,10 @@ class TestTable(unittest.TestCase):
                 HR
             }
         '''
-        with self.assertRaises(TableError):
-            Table.division(Table(string1), Table(string2))
+        table = Table.division(Table(string1), Table(string2))
+        self.assertEqual(len(table.columns), 3)
+        self.assertEqual(len(table.rows), 0)
+        self.assertEqual(table.columns, ['ID', 'Name', 'Age'])
 
     def test_division7(self):
         string1 = '''
@@ -972,5 +978,115 @@ class TestTable(unittest.TestCase):
                 HR
             }
         '''
-        with self.assertRaises(TableError):
-            Table.division(Table(string1), Table(string2))
+        table = Table.division(Table(string1), Table(string2))
+        self.assertEqual(len(table.columns), 3)
+        self.assertEqual(len(table.rows), 0)
+        self.assertEqual(table.columns, ['ID', 'Name', 'Age'])
+
+    def test_division8(self):
+        string1 = '''
+            Employees1 (ID, Name, Age, Dept) = {
+                1, John, 32, Finance
+                2, Alice, 28, Finance
+                3, Bob, 29, Finance
+                1, John, 32, Sales
+                2, Alice, 28, Sales
+                3, Bob, 29, Sales
+                1, John, 32, HR
+                2, Alice, 28, HR
+                3, Bob, 29, HR
+            }
+        '''
+        string2 = '''
+            Employees2 (Dept) = {
+                Finance
+                Sales
+                HR
+            }
+        '''
+        table = Table.division(Table(string1), Table(string2))
+        self.assertEqual(table.name, '')
+        self.assertEqual(len(table.columns), 3)
+        self.assertEqual(len(table.rows), 3)
+        self.assertEqual(table.columns, ['ID', 'Name', 'Age'])
+        self.assertEqual(table.rows[0], [1, 'John', 32])
+        self.assertEqual(table.rows[1], [2, 'Alice', 28])
+        self.assertEqual(table.rows[2], [3, 'Bob', 29])
+
+    def test_division9(self):
+        string1 = '''
+            Employees1 (ID, Name, Age, Dept) = {
+                1, John, 32, Finance
+                1, John, 32, IT
+                2, Alice, 28, Finance
+                3, Bob, 29, Finance
+                4, Alex, 27, IT
+                1, John, 32, Sales
+                2, Alice, 28, Sales
+                3, Bob, 29, Sales
+                1, John, 32, HR
+                2, Alice, 28, HR
+                4, Alex, 27, Finance
+                4, Alex, 27, Sales
+                3, Bob, 29, HR
+                3, Bob, 29, Finance
+                5, Jill, 31, Finance
+                5, Jill, 31, Sales
+                5, Jill, 31, IT
+                5, Jill, 31, HR
+            }
+        '''
+        string2 = '''
+            Employees2 (Dept) = {
+                Finance
+                Sales
+                HR
+            }
+        '''
+        table = Table.division(Table(string1), Table(string2))
+        self.assertEqual(table.name, '')
+        self.assertEqual(len(table.columns), 3)
+        self.assertEqual(len(table.rows), 4)
+        self.assertEqual(table.columns, ['ID', 'Name', 'Age'])
+        self.assertEqual(table.rows[0], [1, 'John', 32])
+        self.assertEqual(table.rows[1], [2, 'Alice', 28])
+        self.assertEqual(table.rows[2], [3, 'Bob', 29])
+        self.assertEqual(table.rows[3], [5, 'Jill', 31])
+
+    def test_division10(self):
+        string1 = '''
+            Employees1 (ID, Name, Age, Dept) = {
+                1, John, 32, Finance
+                1, John, 32, Sales
+                1, John, 32, HR
+                1, John, 32, Finance
+                1, John, 32, Sales
+                1, John, 32, HR
+                1, John, 32, Finance
+                1, John, 32, Sales
+                1, John, 32, HR
+                2, Alice, 28, Finance
+                2, Alice, 28, Sales
+                2, Alice, 28, HR
+                3, Bob, 29, Finance
+                3, Bob, 29, Sales
+                3, Bob, 29, HR
+            }
+        '''
+        string2 = '''
+            Employees2 (Dept) = {
+                Finance
+                Sales
+                HR
+            }
+        '''
+        table = Table.division(Table(string1), Table(string2))
+        self.assertEqual(table.name, '')
+        self.assertEqual(len(table.columns), 3)
+        self.assertEqual(len(table.rows), 5)
+        self.assertEqual(table.columns, ['ID', 'Name', 'Age'])
+        self.assertEqual(table.rows[0], [1, 'John', 32])
+        self.assertEqual(table.rows[1], [1, 'John', 32])
+        self.assertEqual(table.rows[2], [1, 'John', 32])
+        self.assertEqual(table.rows[3], [2, 'Alice', 28])
+        self.assertEqual(table.rows[4], [3, 'Bob', 29])
