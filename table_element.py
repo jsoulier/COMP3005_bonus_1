@@ -35,6 +35,8 @@ class TableElement:
 
     def __str__(self):
         ''''''
+        if not self.value:
+            return 'null'
         return str(self.value)
     
     def __repr__(self):

@@ -1,1 +1,11 @@
-σπ×⨝⟕⟖⟗∪∩−÷
+Employees (ID, Name, Age, Dept) = {
+    1, John, 32, Sales
+    2, Alice, 28, Finance
+    3, Bob, 29, HR
+}
+Department (Name, Budget) = {
+    Finance, 20000
+    Sales, 30000
+    HR, 25000
+}
+Employees × Department

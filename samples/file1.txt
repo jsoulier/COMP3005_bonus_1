@@ -1,32 +1,30 @@
 
-      
-Stud_Course (id, cname, mark) = { 
-                                     
-    1, Math, 3                
-    1, Physics, 2           
-    1, Network, 3          
-    2, Math, 3               
-    2, Physics, 2              
-           
-    2, Network, 3  
-    3, Network, 3        
-}                         
-         
-Course (cname, Hours) = {       
-                      
-    Math, 3  
-    Physics, 2     
-                   
-    Network, 3          
-}          
-(pi id, cname Stud_Course) / (pi cname Course) 
-        
-Student (id, name, email, Dept) = {          
-    1, Alex, a@c, Sales  
-
-    2, John, j@c, Finance 
-
-    3, Mo, m@c, HR
+Employees (id, name) = {
+    1, Jaan
+    2, Alex
+    3, Josh
 }
 
-((pi id, cname Stud_Course) / (pi cname (Course))) ⨝ Student
+Payroll (id, salary, department) = {
+    1, 1000, Finance
+    2, 2000, Sales
+    3, 3000, HR
+}
+
+Employees ⨝ Payroll
+
+σ salary > 1000 (Employees ⨝ Payroll)
+
+π id, name (σ salary > 1000 (Employees ⨝ Payroll))
+
+(π id, name (σ salary > 1000 (Employees ⨝ Payroll))) ⟗ Payroll
+
+π name, department ((π id, name (σ salary > 1000 (Employees ⨝ Payroll))) ⟗ Payroll)
+
+Cities (city, type) = {
+    Ottawa, Finance
+    Toronto, HR
+    Vancouver, Sales
+}
+
+(π name, department ((π id, name (σ salary > 1000 (Employees ⨝ Payroll))) ⟗ Payroll)) ⨝ department=type Cities

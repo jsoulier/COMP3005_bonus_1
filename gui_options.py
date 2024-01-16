@@ -1,6 +1,5 @@
 import tkinter
 import tkinter.filedialog as filedialog
-import tkinter.messagebox as messagebox
 
 from table_operator import TableOperator
 
@@ -42,12 +41,6 @@ class GUIOptions(tkinter.Menu):
         string = ''
         with open(path, 'r', encoding='utf-8') as file:
             string = file.read()
-
-        # Ensure user wants to override
-        if self.editor.get():
-            result = messagebox.askyesno('Yes/No', 'Anything unsaved will be lost. Continue?')
-            if not result:
-                return
             
         self.editor.set(string)
 
