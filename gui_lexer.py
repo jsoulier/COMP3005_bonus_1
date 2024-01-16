@@ -36,8 +36,7 @@ class GUILexer(tkinter.Toplevel):
             # Try to print tables and queries
             tables = self.lexer.compute(string)
             queries = self.lexer.queries
-            for i, [table, query] in enumerate(zip(tables, queries)):
-                table.name = 'Query' + str(i)
+            for table, query in zip(tables, queries):
                 self.editor.insert(query)
                 self.editor.insert(' =\n')
                 self.editor.insert(table)
