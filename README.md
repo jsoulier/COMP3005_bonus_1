@@ -9,6 +9,7 @@ See [manual](MANUAL.pdf) for requirements.
 
 * Graphical user interface
 * Loading and saving documents
+* Undo and redo stack
 * Multiple tables and queries per document
 * Wide range of table operations
 * Extensive suite of tests

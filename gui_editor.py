@@ -11,6 +11,9 @@ class GUIEditor(ttk.Frame):
         # Create text widget
         self.text = tkinter.Text(self, wrap=tkinter.NONE)
         self.text.grid(row=0, column=0, sticky=tkinter.NSEW)
+        self.text.configure(undo=tkinter.TRUE)
+        self.text.configure(maxundo=-1)
+        self.text.bind('<Key>', self.key)
 
         # Allow fill
         self.columnconfigure(0, weight=1)
@@ -25,6 +28,28 @@ class GUIEditor(ttk.Frame):
         self.text.configure(xscrollcommand=self.scrollbar2.set)
 
         self.pack(fill=tkinter.BOTH, expand=tkinter.TRUE)
+
+    def key(self, event):
+        ''''''
+        # Needed because autoseparator is broken
+        keys = ['space', 'comma']
+        if event.keysym not in keys:
+            return
+        self.text.edit_separator()
+    
+    def undo(self):
+        ''''''
+        try:
+            self.text.edit_undo()
+        except Exception:
+            pass
+    
+    def redo(self):
+        ''''''
+        try:
+            self.text.edit_redo()
+        except Exception:
+            pass
 
     def insert(self, string):
         ''''''

@@ -15,6 +15,8 @@ class GUIOptions(tkinter.Menu):
         # Add main commands
         self.add_command(label='Open', command=self.open)
         self.add_command(label='Save', command=self.save)
+        self.add_command(label='Undo', command=self.editor.undo)
+        self.add_command(label='Redo', command=self.editor.redo)
         self.add_command(label='Compute', command=self.compute)
 
         # Add table operator commands
