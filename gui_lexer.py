@@ -17,7 +17,6 @@ class GUILexer(tkinter.Toplevel):
         self.quit()
 
         self.editor = GUIEditor(self)
-        self.lexer = Lexer()
 
     def quit(self):
         ''''''
@@ -27,25 +26,15 @@ class GUILexer(tkinter.Toplevel):
     def compute(self, string):
         ''''''
         self.deiconify()
-
-        # Enable editing and clear
-        self.editor.text.config(state=tkinter.NORMAL)
+        self.editor.unlock()
         self.editor.set('')
 
         try:
-            # Try to print tables and queries
-            tables = self.lexer.compute(string)
-            queries = self.lexer.queries
-            for table, query in zip(tables, queries):
-                self.editor.insert(query)
-                self.editor.insert(' =\n')
-                self.editor.insert(table)
-                self.editor.insert('\n\n')
+            self.editor.set(Lexer.format(string))
 
         # If bad formatting or computing, print error
         except Exception as e:
             self.editor.insert(str(e))
             print(e)
 
-        # Disable editing
-        self.editor.text.config(state=tkinter.DISABLED)
+        self.editor.lock()

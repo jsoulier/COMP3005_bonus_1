@@ -70,7 +70,8 @@ class Table:
     def __str__(self):
         ''''''
         string = self.name
-        string += ' '
+        if self.name:
+            string += ' '
         string += '('
 
         # Add columns

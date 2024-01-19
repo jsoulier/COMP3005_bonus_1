@@ -61,5 +61,14 @@ class GUIEditor(ttk.Frame):
     
     def set(self, string):
         ''''''
+        self.unlock()
         self.text.delete(1.0, tkinter.END)
         self.text.insert(tkinter.END, string)
+
+    def unlock(self):
+        ''''''
+        self.text.config(state=tkinter.NORMAL)
+
+    def lock(self):
+        ''''''
+        self.text.config(state=tkinter.DISABLED)

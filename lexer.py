@@ -94,6 +94,24 @@ class Lexer:
         return tables
 
     @staticmethod
+    def format(string):
+        ''''''
+        # Compute results
+        lexer = Lexer()
+        tables = lexer.compute(string)
+        queries = lexer.queries
+
+        # Format tables and queries
+        string = ''
+        for table, query in zip(tables, queries):
+            string += str(query)
+            string += ' =\n'
+            string += str(table)
+            string += '\n\n'
+
+        return string
+    
+    @staticmethod
     def table_start(string):
         ''' Check if string starts a table. '''
         pattern = re.compile(r'.*\(.*\).*=.*\{.*')
