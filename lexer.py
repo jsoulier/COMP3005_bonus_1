@@ -71,7 +71,7 @@ class Lexer:
 
         # Missing table end
         if strings:
-            raise LexerError('Unmatched Parentheses')
+            raise LexerError('Unmatched Curly Brace')
 
     def compute(self, string):
         ''' Compute tables. '''
