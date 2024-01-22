@@ -344,12 +344,14 @@ class Table:
         result = Table('')
         result.columns = copy.deepcopy(table1.columns)
 
-        # Remove columns from table
+        # Remove columns from table and get indices
+        indices = []
         flag = 0
         for column in table2.columns:
             if column not in table1.columns:
                 flag = 1
                 continue
+            indices.append(table1.columns.index(column))
             result.columns.remove(column)
         if flag:
             return result
@@ -357,8 +359,24 @@ class Table:
         # Create hash for each left row to each right row
         rows = {}
         for row1 in table1.rows:
-            row_l = tuple(row1[:-len(table2.columns)])
-            row_r = tuple(row1[-len(table2.columns):])
+            row_l = []
+            row_r = []
+
+            # Create the left hash data
+            for i, column in enumerate(row1):
+                if i in indices:
+                    continue
+                row_l.append(column)
+
+            # Create the right hash data
+            for index in indices:
+                row_r.append(row1[index])
+
+            # We need tuples for hashing
+            row_l = tuple(row_l)
+            row_r = tuple(row_r)
+
+            # Create the hashes
             if row_l not in rows:
                 rows[row_l] = {}
             if row_r not in rows[row_l]:
@@ -376,9 +394,9 @@ class Table:
                     if i == -1:
                         i = rows_r[row2]
                     i = min(i, rows_r[row2])
-                else:
-                    i = -1
-                    break
+                    continue
+                i = -1
+                break
 
             # Add the valid rows
             i = max(i, 0)

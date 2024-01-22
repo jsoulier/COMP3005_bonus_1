@@ -1090,3 +1090,33 @@ class TestTable(unittest.TestCase):
         self.assertEqual(table.rows[2], [1, 'John', 32])
         self.assertEqual(table.rows[3], [2, 'Alice', 28])
         self.assertEqual(table.rows[4], [3, 'Bob', 29])
+
+    def test_division11(self):
+        string1 = '''
+            Employees1 (ID, City, Name, Age, Dept) = {
+                1, Ottawa, John, 32, Finance
+                1, Toronto, John, 32, Sales
+                1, Vancouver, John, 32, HR
+                2, Ottawa, Alice, 28, Finance
+                2, Toronto, Alice, 28, Sales
+                2, Vancouver, Alice, 28, HR
+                3, Ottawa, Bob, 29, Finance
+                3, Toronto, Bob, 29, Sales
+                3, Vancouver, Bob, 29, HR
+            }
+        '''
+        string2 = '''
+            Employees2 (Dept, City) = {
+                Finance, Ottawa
+                Sales, Toronto
+                HR, Vancouver
+            }
+        '''
+        table = Table.division(Table(string1), Table(string2))
+        self.assertEqual(table.name, '')
+        self.assertEqual(len(table.columns), 3)
+        self.assertEqual(len(table.rows), 3)
+        self.assertEqual(table.columns, ['ID', 'Name', 'Age'])
+        self.assertEqual(table.rows[0], [1, 'John', 32])
+        self.assertEqual(table.rows[1], [2, 'Alice', 28])
+        self.assertEqual(table.rows[2], [3, 'Bob', 29])
