@@ -1,4 +1,4 @@
-# Relational Algebra Query Processor
+# COMP3005: Relational Algebra Query Processor
 
 A relational algebra query processor written for COMP3005 at Carleton University.
 
