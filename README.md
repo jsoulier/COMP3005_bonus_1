@@ -1,9 +1,9 @@
-# COMP3005: Relational Algebra Query Processor
+# Relational Algebra Query Processor
 
 Relational algebra query processor written for COMP3005
 
 ![images](images/file1.png)
-See [manual](MANUAL.pdf) for requirements.
+See [manual](MANUAL.pdf) for requirements
 
 ## Features
 
